@@ -64,13 +64,14 @@ exports[`EuiQuickSelect is rendered 1`] = `
       <EuiFormRow
         compressed={true}
         describedByIds={Array []}
+        display="row"
         fullWidth={false}
         hasEmptyLabelSpace={false}
         labelType="label"
       >
         <EuiSelect
           aria-label="Quick time tense"
-          compressed={false}
+          compressed={true}
           fullWidth={false}
           hasNoInitialSelection={false}
           isLoading={false}
@@ -95,13 +96,14 @@ exports[`EuiQuickSelect is rendered 1`] = `
       <EuiFormRow
         compressed={true}
         describedByIds={Array []}
+        display="row"
         fullWidth={false}
         hasEmptyLabelSpace={false}
         labelType="label"
       >
         <EuiFieldNumber
           aria-label="Quick time value"
-          compressed={false}
+          compressed={true}
           fullWidth={false}
           isLoading={false}
           onChange={[Function]}
@@ -113,13 +115,14 @@ exports[`EuiQuickSelect is rendered 1`] = `
       <EuiFormRow
         compressed={true}
         describedByIds={Array []}
+        display="row"
         fullWidth={false}
         hasEmptyLabelSpace={false}
         labelType="label"
       >
         <EuiSelect
           aria-label="Quick time units"
-          compressed={false}
+          compressed={true}
           fullWidth={false}
           hasNoInitialSelection={false}
           isLoading={false}
@@ -165,6 +168,7 @@ exports[`EuiQuickSelect is rendered 1`] = `
     >
       <EuiFormRow
         describedByIds={Array []}
+        display="row"
         fullWidth={false}
         hasEmptyLabelSpace={false}
         labelType="label"
@@ -254,13 +258,14 @@ exports[`EuiQuickSelect prevQuickSelect 1`] = `
       <EuiFormRow
         compressed={true}
         describedByIds={Array []}
+        display="row"
         fullWidth={false}
         hasEmptyLabelSpace={false}
         labelType="label"
       >
         <EuiSelect
           aria-label="Quick time tense"
-          compressed={false}
+          compressed={true}
           fullWidth={false}
           hasNoInitialSelection={false}
           isLoading={false}
@@ -285,13 +290,14 @@ exports[`EuiQuickSelect prevQuickSelect 1`] = `
       <EuiFormRow
         compressed={true}
         describedByIds={Array []}
+        display="row"
         fullWidth={false}
         hasEmptyLabelSpace={false}
         labelType="label"
       >
         <EuiFieldNumber
           aria-label="Quick time value"
-          compressed={false}
+          compressed={true}
           fullWidth={false}
           isLoading={false}
           onChange={[Function]}
@@ -303,13 +309,14 @@ exports[`EuiQuickSelect prevQuickSelect 1`] = `
       <EuiFormRow
         compressed={true}
         describedByIds={Array []}
+        display="row"
         fullWidth={false}
         hasEmptyLabelSpace={false}
         labelType="label"
       >
         <EuiSelect
           aria-label="Quick time units"
-          compressed={false}
+          compressed={true}
           fullWidth={false}
           hasNoInitialSelection={false}
           isLoading={false}
@@ -355,6 +362,7 @@ exports[`EuiQuickSelect prevQuickSelect 1`] = `
     >
       <EuiFormRow
         describedByIds={Array []}
+        display="row"
         fullWidth={false}
         hasEmptyLabelSpace={false}
         labelType="label"
