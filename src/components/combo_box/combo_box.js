@@ -53,6 +53,20 @@ export class EuiComboBox extends Component {
     fullWidth: PropTypes.bool,
     compressed: PropTypes.bool,
     inputRef: PropTypes.func,
+    /**
+     * Creates an input group with element(s) coming before input
+     */
+    prepend: PropTypes.oneOfType([
+      PropTypes.node,
+      PropTypes.arrayOf(PropTypes.node),
+    ]),
+    /**
+     * Creates an input group with element(s) coming after input
+     */
+    append: PropTypes.oneOfType([
+      PropTypes.node,
+      PropTypes.arrayOf(PropTypes.node),
+    ]),
   };
 
   static defaultProps = {
@@ -661,6 +675,8 @@ export class EuiComboBox extends Component {
       fullWidth,
       compressed,
       'data-test-subj': dataTestSubj,
+      prepend,
+      append,
       ...rest
     } = this.props;
     const {
@@ -783,6 +799,8 @@ export class EuiComboBox extends Component {
               : null
           }
           compressed={compressed}
+          prepend={prepend}
+          append={append}
         />
 
         {optionsList}

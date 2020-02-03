@@ -43,6 +43,20 @@ export class EuiComboBoxInput extends Component {
     rootId: PropTypes.func.isRequired,
     focusedOptionId: PropTypes.string,
     compressed: PropTypes.bool.isRequired,
+    /**
+     * Creates an input group with element(s) coming before input
+     */
+    prepend: PropTypes.oneOfType([
+      PropTypes.node,
+      PropTypes.arrayOf(PropTypes.node),
+    ]),
+    /**
+     * Creates an input group with element(s) coming after input
+     */
+    append: PropTypes.oneOfType([
+      PropTypes.node,
+      PropTypes.arrayOf(PropTypes.node),
+    ]),
   };
 
   constructor(props) {
@@ -111,6 +125,8 @@ export class EuiComboBoxInput extends Component {
       rootId,
       focusedOptionId,
       compressed,
+      prepend,
+      append,
     } = this.props;
 
     const pills = selectedOptions.map(option => {
@@ -204,6 +220,7 @@ export class EuiComboBoxInput extends Component {
       'euiComboBox__inputWrap--fullWidth': fullWidth,
       'euiComboBox__inputWrap--noWrap': singleSelection,
       'euiComboBox__inputWrap-isClearable': onClear,
+      'euiComboBox__inputWrap--inGroup': prepend || append,
     });
 
     return (
@@ -211,7 +228,9 @@ export class EuiComboBoxInput extends Component {
         icon={icon}
         {...clickProps}
         fullWidth={fullWidth}
-        compressed={compressed}>
+        compressed={compressed}
+        prepend={prepend}
+        append={append}>
         <div
           className={wrapClasses}
           onClick={onClick}

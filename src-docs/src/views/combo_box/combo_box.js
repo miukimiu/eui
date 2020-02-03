@@ -84,7 +84,11 @@ export default class extends Component {
     const { selectedOptions } = this.state;
     return (
       /* DisplayToggles wrapper for Docs only */
-      <DisplayToggles canDisabled={false} canReadOnly={false}>
+      <DisplayToggles
+        canDisabled={false}
+        canReadOnly={false}
+        canPrepend
+        canAppend>
         <EuiComboBox
           placeholder="Select or create options"
           options={this.options}
