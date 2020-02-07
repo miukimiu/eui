@@ -4,7 +4,6 @@ import React, {
   ReactElement,
   SVGAttributes,
 } from 'react';
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 import { CommonProps, keysOf } from '../common';
@@ -381,6 +380,13 @@ const typeToPathMap = {
   tokenFile: 'tokens/tokenFile',
   tokenModule: 'tokens/tokenModule',
   tokenNamespace: 'tokens/tokenNamespace',
+  tokenDate: 'tokens/tokenDate',
+  tokenIP: 'tokens/tokenIP',
+  tokenNested: 'tokens/tokenNested',
+  tokenAlias: 'tokens/tokenAlias',
+  tokenShape: 'tokens/tokenShape',
+  tokenGeo: 'tokens/tokenGeo',
+  tokenRange: 'tokens/tokenRange',
 };
 
 export const TYPES = keysOf(typeToPathMap);
@@ -388,11 +394,6 @@ export const TYPES = keysOf(typeToPathMap);
 export type EuiIconType = keyof typeof typeToPathMap;
 
 export type IconType = EuiIconType | string | ReactElement;
-
-export const IconPropType = PropTypes.oneOfType([
-  PropTypes.string,
-  PropTypes.node,
-]);
 
 const colorToClassMap = {
   default: null,
