@@ -54,14 +54,14 @@ export class EuiComboBox extends Component {
     compressed: PropTypes.bool,
     inputRef: PropTypes.func,
     /**
-     * Creates an input group with element(s) coming before input
+     * Creates an input group with element(s) coming before input. It only shows when the `singleSelection` is `true`.
      */
     prepend: PropTypes.oneOfType([
       PropTypes.node,
       PropTypes.arrayOf(PropTypes.node),
     ]),
     /**
-     * Creates an input group with element(s) coming after input
+     * Creates an input group with element(s) coming after input. It only shows when the `singleSelection` is `true`.
      */
     append: PropTypes.oneOfType([
       PropTypes.node,
@@ -746,6 +746,19 @@ export class EuiComboBox extends Component {
       );
     }
 
+    // The prepend and append only works if the input doesn't break in multiple lines
+    //  When the single selection is true the input gets one-line
+    let singleSelectionPrepend;
+    let singleSelectionAppend;
+
+    if (singleSelection) {
+      singleSelectionPrepend = { prepend: prepend };
+    }
+
+    if (singleSelection) {
+      singleSelectionAppend = { append: append };
+    }
+
     return (
       /**
        * Re: jsx-a11y/interactive-supports-focus
@@ -799,8 +812,8 @@ export class EuiComboBox extends Component {
               : null
           }
           compressed={compressed}
-          prepend={prepend}
-          append={append}
+          {...singleSelectionPrepend}
+          {...singleSelectionAppend}
         />
 
         {optionsList}
