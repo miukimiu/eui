@@ -58,6 +58,7 @@ export default class extends Component {
     const { selectedOptions } = this.state;
     return (
       <DisplayToggles
+        canLoading={false}
         canDisabled={false}
         canReadOnly={false}
         canPrepend
