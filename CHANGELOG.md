@@ -1,13 +1,38 @@
 ## [`master`](https://github.com/elastic/eui/tree/master)
 
+- Converted `EuiFilePicker` to TypeScript ([#2832](https://github.com/elastic/eui/issues/2832))
+- Exported `EuiSelectOptionProps` type ([#2830](https://github.com/elastic/eui/pull/2830))
+
+## [`19.0.0`](https://github.com/elastic/eui/tree/v19.0.0)
+
 - Added `cheer` glyph to `EuiIcon` ([#2814](https://github.com/elastic/eui/pull/2814))
 - Added `tableCaption` prop to `EuiBasicTable` and improved the default one ([#2782](https://github.com/elastic/eui/pull/2782))
+- Converted `EuiDescribedFormGroup` to TypeScript ([#2810](https://github.com/elastic/eui/pull/2810))
 - Changed SASS comments to non-compiled comments in invisibles files ([#2807](https://github.com/elastic/eui/pull/2807))
+- Optimized the third party logos Ceph, DropWizard, Golang, and Haproxy ([#2812](https://github.com/elastic/eui/pull/2812))
 - Added `rowHeader` prop to `EuiBasicTable` to allow consumers to set the identifying cell in a row ([#2802](https://github.com/elastic/eui/pull/2802))
+- Added prepend and append to `EuiColorPicker` ([#2819](https://github.com/elastic/eui/pull/2819))
+- Improved `EuiDescribedFormGroup` accessibility by avoiding duplicated output in screen readers ([#2783](https://github.com/elastic/eui/pull/2783))
+- Added optional `key` attribute to `EuiContextMenu` items and relaxed `name` attribute to allow any React node ([#2817](https://github.com/elastic/eui/pull/2817))
+- Converted `EuiColorPicker` color conversion functions to `chroma-js` methods ([#2805](https://github.com/elastic/eui/pull/2805))
+- Added `direction` parameter to `euiPaletteColorBlind()` for specifiying lighter or darker (or both) alternates ([#2822](https://github.com/elastic/eui/pull/2822))
+- Converted `EuiSideNav` to TypeScript ([#2818](https://github.com/elastic/eui/issues/2818))
+- Added babel-transformed and partially mocked commonjs build (`test-env/`) to target Kibana's Jest environment ([#2698](https://github.com/elastic/eui/pull/2698))
+- Altered styles of `EuiToken` and add added more token types to match ES field types of `tokenAlias`, `tokenDate`, `tokenGeo`, `tokenIP`, `tokenNested`, `tokenRange`, `tokenShape` ([#2758](https://github.com/elastic/eui/pull/2758))
 
 **Bug fixes**
 
 - Exported missing `EuiSelectProps` type ([#2815](https://github.com/elastic/eui/pull/2815))
+- Fixed `EuiCode`'s & `EuiCodeBlock`'s ability to accept non-string children ([#2792](https://github.com/elastic/eui/pull/2792)) ([#2820](https://github.com/elastic/eui/pull/2820))
+- Fixed `EuiSearchBar`, `Query`, and `AST`'s ability to accept literal parenthesis characters ([#2791](https://github.com/elastic/eui/pull/2791))
+- Fixed coloring of input fields when autofill is on in Chrome ([#2798](https://github.com/elastic/eui/pull/2798))
+- Moved `@types/enzyme` and `@types/react-virtualized` to `dependencies` status ([#2828](https://github.com/elastic/eui/pull/2828))
+- Removed `@elastic/charts` from inclusion in `eui.d.ts` output ([#2828](https://github.com/elastic/eui/pull/2828))
+
+**Breaking changes**
+
+- Removed `idAria` prop from `EuiDescribedFormGroup` ([#2783](https://github.com/elastic/eui/pull/2783))
+- Removed `EuiToken`'s `hideBorder` and `displayOptions` prop for applying `color`, `shape`, and `fill` props directly. Changed `fill` prop type from `boolean` to `light | dark | none`. ([#2758](https://github.com/elastic/eui/pull/2758))
 
 ## [`18.3.0`](https://github.com/elastic/eui/tree/v18.3.0)
 
@@ -18,7 +43,6 @@
 - Converted `EuiFilterButton` to TypeScript ([#2761](https://github.com/elastic/eui/pull/2761))
 - Converted `EuiFilterSelectItem` to TypeScript ([#2761](https://github.com/elastic/eui/pull/2761))
 - Converted `EuiFieldSearch` to TypeScript ([#2775](https://github.com/elastic/eui/pull/2775))
-- Improved `EuiDescribedFormGroup` accessibility by avoiding duplicated output in screen readers ([#2783](https://github.com/elastic/eui/pull/2783))
 - Added `data-test-subj` to the `EuiContextMenuItem` in `EuiTablePagination` ([#2778](https://github.com/elastic/eui/pull/2778))
 - Improved `EuiIcon` a11y by using a `title` and `aria-labelledby` ([#2786](https://github.com/elastic/eui/pull/2786))
 - Improved compressed `EuiPagination` by including active and last page numbers ([#2779](https://github.com/elastic/eui/pull/2779))
@@ -46,10 +70,6 @@
 **Bug fixes**
 
 - Fixed `useRenderToText` and `EuiButtonToggle` from attempting state updates on unmounted components ([#2797](https://github.com/elastic/eui/pull/2797))
-
-**Breaking changes**
-
-- Removed `idAria` prop from `EuiDescribedFormGroup` ([#2783](https://github.com/elastic/eui/pull/2783))
 
 **Deprecations**
 
