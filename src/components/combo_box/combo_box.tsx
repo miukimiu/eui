@@ -43,6 +43,7 @@ import {
 import { EuiFilterSelectItem } from '../filter_group';
 import AutosizeInput from 'react-input-autosize';
 import { CommonProps } from '../common';
+import { EuiFormControlLayoutProps } from '../form';
 
 type DrillProps<T> = Pick<
   EuiComboBoxOptionsListProps<T>,
@@ -73,6 +74,8 @@ interface _EuiComboBoxProps<T>
   placeholder?: string;
   rowHeight?: number;
   singleSelection: boolean | EuiComboBoxSingleSelectionShape;
+  prepend?: EuiFormControlLayoutProps['prepend'];
+  append?: EuiFormControlLayoutProps['append'];
 }
 
 /**
@@ -121,6 +124,8 @@ export class EuiComboBox<T> extends Component<
     options: [],
     selectedOptions: [],
     singleSelection: false,
+    prepend: null,
+    append: null,
   };
 
   state: EuiComboBoxState<T> = {
@@ -790,6 +795,8 @@ export class EuiComboBox<T> extends Component<
       rowHeight,
       selectedOptions,
       singleSelection,
+      prepend,
+      append,
       ...rest
     } = this.props;
     const {
@@ -912,8 +919,9 @@ export class EuiComboBox<T> extends Component<
           toggleButtonRef={this.toggleButtonRefCallback}
           updatePosition={this.updatePosition}
           value={value}
+          append={singleSelection ? append : undefined}
+          prepend={singleSelection ? prepend : undefined}
         />
-
         {optionsList}
       </div>
     );

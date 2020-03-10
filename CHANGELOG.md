@@ -1,6 +1,6 @@
 ## [`master`](https://github.com/elastic/eui/tree/master)
 
-No public interface changes since `21.0.0`.
+- Added `prepend` and `append` ability to `EuiComboBox` ([#3003](https://github.com/elastic/eui/pull/3003))
 
 ## [`21.0.0`](https://github.com/elastic/eui/tree/v21.0.0)
 
