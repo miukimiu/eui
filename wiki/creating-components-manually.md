@@ -42,7 +42,7 @@ There are a couple themes to keep in mind when adding snippets:
 
 #### Stay consistent
 - When using text should it display actual strings or comments?
-- Don't use `this.` Write the snippet like you're writing a **Function Component**. Give descriptive function and state names.
+- Don't use `this.` Write the snippet like a **Function Component** with descriptive function and state names.
 
 ``` js
 <EuiPopover
@@ -53,8 +53,7 @@ There are a couple themes to keep in mind when adding snippets:
 </EuiPopover>
 ```
 
-- If the demo code provides lots of examples, this is probably mostly for us maintainers to manage all the different states. However, **the consumer really just needs a single basic snippet**. In some cases you can add a second one with the **most common props in their default states**. 
-The basic example should always come first.
+- If the demo code provides lots of examples, this is probably mostly for us maintainers to manage all the different states. However, **the consumer really just needs a single basic snippet**. In some cases you can add a second one with the **most common props in their default states**. The basic example should always come first.
 
 ```js
 <EuiLink href="#"><!-- Link text --></EuiLink>
@@ -70,7 +69,7 @@ The basic example should always come first.
 <EuiText color="danger"><!-- Raw HTML content --></EuiText>
 ```
 
-- When a component requires a specific element to wrap the `children` use the element in the snippet.
+- The snippet should illustrate when a component requires its children to be wrapped with specific elements.
 
 ``` js
 <EuiCallOut>
@@ -78,7 +77,15 @@ The basic example should always come first.
 </EuiCallOut>
 ```
 
-- When a component prop receive an array of objects use only one object.
+- When a component contains a single element child the snippet should illustrate it.
+
+``` js
+<EuiTitle>
+  <h2><!-- Text --></h2>
+</EuiTitle>
+```
+
+- When a component `prop` receives an array of objects use only one object.
 
 ``` js
 <EuiSteps
