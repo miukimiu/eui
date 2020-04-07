@@ -70,7 +70,7 @@ The basic example should always come first.
 <EuiText color="danger"><!-- Raw HTML content --></EuiText>
 ```
 
-- When a component requires a specific element to wrap the `children` use the element in the snippet.
+- The snippet should illustrate when a component requires its children to be wrapped with specific elements.
 
 ``` js
 <EuiCallOut>
@@ -78,7 +78,15 @@ The basic example should always come first.
 </EuiCallOut>
 ```
 
-- When a component prop receive an array of objects use only one object.
+- When a component contains a single element child the snippet should illustrate it.
+
+``` js
+<EuiTitle>
+  <h2><!-- Text --></h2>
+</EuiTitle>
+```
+
+- When a component `prop` receives an array of objects use only one object.
 
 ``` js
 <EuiSteps
