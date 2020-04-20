@@ -136,12 +136,17 @@ export const FlyoutExample = {
             from the right side of the screen. It should be used any time you
             need to perform quick, individual actions to a larger page or list.
           </p>
-
-          <p>
-            For accessibility, use{' '}
-            <EuiCode>{'aria-labelledby={headingId}'}</EuiCode> to announce the
-            flyout to screen readers when the user opens it.
-          </p>
+          <EuiCallOut
+            color="warning"
+            iconType="accessibility"
+            title={
+              <>
+                For accessibility, use{' '}
+                <EuiCode>{'aria-labelledby={headingId}'}</EuiCode> to announce
+                the flyout to screen readers when the user opens it.
+              </>
+            }
+          />
         </div>
       ),
       props: { EuiFlyout, EuiFlyoutHeader, EuiFlyoutBody },
