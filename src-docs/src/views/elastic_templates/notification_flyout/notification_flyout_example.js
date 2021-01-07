@@ -103,19 +103,31 @@ export const NotificationFlyoutExample = {
             few of them are just opinionated implementations of other EUI
             components.
           </p>
-          <h3>Flyout components </h3>
+          <h4>EuiNotificationFlyout</h4>
           <p>
-            Use the EuiNotificationFlyout to create a flyout. As a template
-            component, all the design decisions are already done.
+            As a template component, all the design decisions are already done.
           </p>
+          <h4>EuiNotificationFlyoutHeader</h4>
           <p>
-            Use EuiNotificationFlyoutHeader to create the flyout header and add
-            actions you might need, like filters.
+            Use this component to create the flyout header and add actions you
+            might need, like filters.
           </p>
+          <h4>EuiNotificationFlyoutBody</h4>
           <p>
-            Use the EuiNotificationFlyoutBody as a wrapper for the notifications
+            Use this component to create as a wrapper for the notifications
             messages and suggestions.
           </p>
+          <h4>EuiNotificationSuggestions</h4>
+          <p>
+            Use this component to create as a wrapper for the notifications
+            messages and suggestions.
+          </p>
+          <h4>EuiNotificationEvents</h4>
+          <p>
+            Use this component to create as a wrapper for the notifications
+            messages and suggestions.
+          </p>
+          <h4>EuiNotificationFlyoutFooter</h4>
           <p>
             Use the EuiNotificationFlyoutFooter to add main actions like buttons
             to redirect the user to a notification center.
