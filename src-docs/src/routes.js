@@ -212,6 +212,10 @@ import { I18nTokens } from './views/package/i18n_tokens';
 
 import { SuperSelectExample } from './views/super_select/super_select_example';
 
+/** Elastic Templates */
+
+import { NotificationFlyoutExample } from './views/elastic_templates/notification_flyout/notification_flyout_example';
+
 /** Elastic Charts */
 
 import { ElasticChartsThemingExample } from './views/elastic_charts/theming_example';
@@ -428,6 +432,10 @@ const navigation = [
       CodeEditorExample,
       CodeExample,
     ].map((example) => createExample(example)),
+  },
+  {
+    name: 'Elastic Templates',
+    items: [NotificationFlyoutExample].map((example) => createExample(example)),
   },
   {
     name: 'Elastic Charts',
