@@ -138,10 +138,10 @@ const HeaderUpdates = forwardRef(
     const bellRef = useRef();
     const cheerRef = useRef();
 
-    // we're passing passing the `triggerAnimation` callbacks to the `headerUpdatesRef` child components that we want to animate
+    // we're passing passing the `animate` callbacks to the `headerUpdatesRef` child components that we want to animate
     const animate = useCallback(() => {
-      bellRef.current?.triggerAnimation();
-      cheerRef.current?.triggerAnimation();
+      bellRef.current?.animate();
+      cheerRef.current?.animate();
     }, []);
 
     // we're using the `useImperativeHandle` which allows the child to expose a function to the parent

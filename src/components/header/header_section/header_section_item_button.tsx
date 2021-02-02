@@ -74,7 +74,7 @@ export const EuiHeaderSectionItemButton = forwardRef<
       ref,
       () => {
         if (buttonRef) {
-          (buttonRef as any).triggerAnimation = () => {
+          (buttonRef as any).animate = () => {
             const keyframes: Keyframe[] = [
               { transform: 'rotate(0)', offset: 0, easing: 'ease-in-out' },
               {

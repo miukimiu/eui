@@ -106,7 +106,9 @@ const headerLinksSnippet = `<EuiHeader>
   </EuiHeaderLinks>
 </EuiHeader>`;
 
-const headerAlertSnippet = `<EuiHeader>
+const headerAlertSnippet = [
+  ,
+  `<EuiHeader>
   <EuiHeaderSection grow={false}>
     <EuiHeaderSectionItem>
       <!-- HeaderSectionItem content -->
@@ -117,18 +119,24 @@ const headerAlertSnippet = `<EuiHeader>
     <EuiHeaderSectionItem>
       <!-- Button to trigger portal content like a EuiPopover or a EuiFlyout -->
       <EuiHeaderSectionItemButton
+        ref={bellButtonRef}
         aria-controls={portalContentId}
         aria-expanded={isPortalContentVisible}
         aria-label="Open portal content"
         onClick={() => showPortalConten()}
         notification={showNotification}
-        animation={isAnimating}
       >
         <EuiIcon type="bell" />
       </EuiHeaderSectionItemButton>
     </EuiHeaderSectionItem>
   </EuiHeaderSection>
-</EuiHeader>`;
+</EuiHeader>`,
+  `<!-- You can target the bellButtonRef to trigger the animation -->
+<EuiButton onClick={() => bellButtonRef.current?.animate()}>
+  Animate
+</EuiButton>
+`,
+];
 
 export const HeaderExample = {
   title: 'Header',
@@ -343,9 +351,8 @@ export const HeaderExample = {
             <EuiCode>node</EuiCode> that will render inside a{' '}
             <strong>EuiBadgeNotification</strong> or pass{' '}
             <EuiCode>true</EuiCode> to render a simple dot. You can also animate
-            the button by calling the <EuiCode>triggerAnimation()</EuiCode>{' '}
-            method on the <strong>EuiHeaderSectionItemButton</strong>{' '}
-            <EuiCode>ref</EuiCode>.
+            the button by calling the <EuiCode>animate()</EuiCode> method on the{' '}
+            <strong>EuiHeaderSectionItemButton</strong> <EuiCode>ref</EuiCode>.
           </p>
 
           <p>
