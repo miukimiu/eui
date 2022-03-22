@@ -70,6 +70,7 @@ export const EuiTimelineItemEvent: FunctionComponent<EuiTimelineItemEventProps> 
   className,
   header,
   body,
+  children,
   panelProps = {
     paddingSize: 'none',
     color: 'transparent',
@@ -110,7 +111,7 @@ export const EuiTimelineItemEvent: FunctionComponent<EuiTimelineItemEventProps> 
           <HeaderElement className={headerClasses}>{header}</HeaderElement>
         )}
 
-        {body && <div className={bodyClasses}>{body}</div>}
+        {children || (body && <div className={bodyClasses}>{body}</div>)}
       </Element>
     </EuiPanel>
   );

@@ -21,6 +21,7 @@ export type EuiTimelineProps = HTMLAttributes<HTMLDivElement> &
 
 export const EuiTimeline: FunctionComponent<EuiTimelineProps> = ({
   className,
+  children,
   items,
   ...rest
 }) => {
@@ -36,7 +37,7 @@ export const EuiTimeline: FunctionComponent<EuiTimelineProps> = ({
 
   return (
     <div className={classes} {...rest}>
-      {timelineElements}
+      {timelineElements || children}
     </div>
   );
 };
