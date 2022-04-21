@@ -168,25 +168,6 @@ export default () => {
 
       <EuiSpacer size="l" />
 
-      <EuiText grow={false}>
-        <p>
-          Most of the time the z-index is handled per component. But you can use
-          this table as a reference to how EUI layers the components.
-        </p>
-      </EuiText>
-
-      <EuiSpacer size="l" />
-
-      <EuiCallOut color="warning">
-        <p>
-          If you do have to adjust z-index levels, remember that they become
-          scoped only to their parents if their parent also has a custom
-          z-index.
-        </p>
-      </EuiCallOut>
-
-      <EuiSpacer size="xl" />
-
       {levelsContent}
     </GuidePage>
   );
