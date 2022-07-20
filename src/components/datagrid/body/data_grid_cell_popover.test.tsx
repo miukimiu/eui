@@ -10,10 +10,10 @@ import React from 'react';
 import { act } from 'react-dom/test-utils';
 import { shallow } from 'enzyme';
 import { keys } from '../../../services';
-import { testCustomHook } from '../../../test/test_custom_hook.test_helper';
+import { testCustomHook } from '../../../test/internal';
 
 import { DataGridCellPopoverContextShape } from '../data_grid_types';
-import { useCellPopover } from './data_grid_cell_popover';
+import { useCellPopover, DefaultCellPopover } from './data_grid_cell_popover';
 
 describe('useCellPopover', () => {
   describe('openCellPopover', () => {
@@ -70,7 +70,7 @@ describe('useCellPopover', () => {
     });
   });
 
-  describe('cellPopver', () => {
+  describe('cellPopover', () => {
     const mockPopoverAnchor = document.createElement('div');
     const mockPopoverContent = (
       <div data-test-subj="mockPopover">Hello world</div>
@@ -95,7 +95,6 @@ describe('useCellPopover', () => {
       populateCellPopover(cellPopoverContext);
       expect(getUpdatedState().cellPopover).toMatchInlineSnapshot(`
         <EuiWrappingPopover
-          anchorClassName="euiDataGridRowCell__expand"
           button={<div />}
           closePopover={[Function]}
           display="block"
@@ -120,6 +119,20 @@ describe('useCellPopover', () => {
     });
 
     describe('onKeyDown', () => {
+      let rafSpy: jest.SpyInstance;
+      beforeAll(() => {
+        rafSpy = jest
+          .spyOn(window, 'requestAnimationFrame')
+          .mockImplementation((cb: Function) => cb());
+      });
+      beforeEach(() => jest.clearAllMocks());
+      afterAll(() => rafSpy.mockRestore());
+
+      // Mock a focusable cell parent
+      const mockCell = document.createElement('div');
+      mockCell.tabIndex = 0;
+      mockCell.appendChild(mockPopoverAnchor);
+
       const renderCellPopover = () => {
         const {
           return: { cellPopoverContext },
@@ -135,7 +148,7 @@ describe('useCellPopover', () => {
         return { component, getUpdatedState };
       };
 
-      it('closes the popover when the Escape key is pressed', () => {
+      it('closes the popover and refocuses the cell when the Escape key is pressed', () => {
         const { component, getUpdatedState } = renderCellPopover();
         expect(getUpdatedState().cellPopoverContext.popoverIsOpen).toEqual(
           true
@@ -149,12 +162,13 @@ describe('useCellPopover', () => {
         act(() => {
           component.find('EuiWrappingPopover').simulate('keyDown', event);
         });
+        expect(event.preventDefault).toHaveBeenCalled();
+        expect(event.stopPropagation).toHaveBeenCalled();
 
         expect(getUpdatedState().cellPopoverContext.popoverIsOpen).toEqual(
           false
         );
-        expect(event.preventDefault).toHaveBeenCalled();
-        expect(event.stopPropagation).toHaveBeenCalled();
+        expect(document.activeElement).toEqual(mockCell);
       });
 
       it('closes the popover when the F2 key is pressed', () => {
@@ -171,12 +185,13 @@ describe('useCellPopover', () => {
         act(() => {
           component.find('EuiWrappingPopover').simulate('keyDown', event);
         });
+        expect(event.preventDefault).toHaveBeenCalled();
+        expect(event.stopPropagation).toHaveBeenCalled();
 
         expect(getUpdatedState().cellPopoverContext.popoverIsOpen).toEqual(
           false
         );
-        expect(event.preventDefault).toHaveBeenCalled();
-        expect(event.stopPropagation).toHaveBeenCalled();
+        expect(document.activeElement).toEqual(mockCell);
       });
 
       it('does nothing when other keys are pressed', () => {
@@ -193,13 +208,66 @@ describe('useCellPopover', () => {
         act(() => {
           component.find('EuiWrappingPopover').simulate('keyDown', event);
         });
+        expect(event.preventDefault).not.toHaveBeenCalled();
+        expect(event.stopPropagation).not.toHaveBeenCalled();
+        expect(rafSpy).not.toHaveBeenCalled();
 
         expect(getUpdatedState().cellPopoverContext.popoverIsOpen).toEqual(
           true
         );
-        expect(event.preventDefault).not.toHaveBeenCalled();
-        expect(event.stopPropagation).not.toHaveBeenCalled();
       });
     });
+  });
+});
+
+describe('popover content renderers', () => {
+  const cellContentsElement = document.createElement('div');
+  cellContentsElement.innerText = '{ "hello": "world" }';
+  const props = {
+    rowIndex: 0,
+    colIndex: 0,
+    columnId: 'someId',
+    schema: null,
+    children: <div data-test-subj="mockCellValue">Content</div>,
+    cellActions: <div data-test-subj="mockCellActions">Action</div>,
+    cellContentsElement,
+    DefaultCellPopover,
+  };
+
+  test('default cell popover', () => {
+    const component = shallow(<DefaultCellPopover {...props} />);
+    expect(component).toMatchInlineSnapshot(`
+      <Fragment>
+        <EuiText>
+          <div
+            data-test-subj="mockCellValue"
+          >
+            Content
+          </div>
+        </EuiText>
+        <div
+          data-test-subj="mockCellActions"
+        >
+          Action
+        </div>
+      </Fragment>
+    `);
+  });
+
+  test('JSON schema popover', () => {
+    const component = shallow(<DefaultCellPopover {...props} schema="json" />);
+    const codeBlock = component.find('JsonPopoverContent').dive();
+    expect(codeBlock).toMatchInlineSnapshot(`
+      <EuiCodeBlock
+        isCopyable={true}
+        language="json"
+        paddingSize="none"
+        transparentBackground={true}
+      >
+        {
+        "hello": "world"
+      }
+      </EuiCodeBlock>
+    `);
   });
 });

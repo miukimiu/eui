@@ -8,19 +8,29 @@ import {
   EuiSpacer,
   EuiTitle,
   useEuiTheme,
+  EuiBadge,
+  logicalCSS,
+  useIsWithinBreakpoints,
+  useEuiPaddingCSS,
 } from '../../../../../src';
-import { _EuiSplitPanelInnerProps } from '../../../../../src/components/panel/split_panel';
+import {
+  _EuiSplitPanelInnerProps,
+  _EuiSplitPanelOuterProps,
+} from '../../../../../src/components/panel/split_panel';
 
 import { GuideSectionExample } from '../../../components/guide_section/guide_section_parts/guide_section_example';
 
-type ThemeExample = {
+export type ThemeExample = {
+  color?: _EuiSplitPanelOuterProps['color'];
   title?: ReactNode;
   description?: ReactNode;
+  type?: string | null;
   property?: string;
   example?: GuideSectionExample['example'];
   examplePanel?: _EuiSplitPanelInnerProps;
   snippet?: GuideSectionExample['tabContent'];
   snippetLanguage?: EuiCodeBlockProps['language'];
+  props?: ReactNode;
   provider?: {
     property?: string;
     type?: string;
@@ -28,16 +38,21 @@ type ThemeExample = {
 };
 
 export const ThemeExample: FunctionComponent<ThemeExample> = ({
+  color,
+  type = 'token',
   title,
   description,
   example,
   examplePanel,
   snippet,
   snippetLanguage = 'jsx',
+  props,
 }) => {
   const { euiTheme } = useEuiTheme();
+  const isLargeBreakpoint = useIsWithinBreakpoints(['m', 'l', 'xl']);
+
   const finalSnippet =
-    snippetLanguage === 'jsx'
+    snippetLanguage === 'emotion'
       ? `css\`
   ${snippet}
 \``
@@ -46,17 +61,41 @@ export const ThemeExample: FunctionComponent<ThemeExample> = ({
   return (
     <>
       <EuiSplitPanel.Outer
-        color="subdued"
+        color={isLargeBreakpoint ? color || 'transparent' : 'subdued'}
         direction="row"
         css={css`
-          margin-bottom: ${euiTheme.size.xl};
+          gap: ${euiTheme.size.xl};
+
+          ${useEuiPaddingCSS(isLargeBreakpoint ? 'vertical' : undefined).xl};
+          /* padding: ${euiTheme.size.xl}; */
+
+          :not(:first-child) {
+            margin-block-start: ${euiTheme.size.xl};
+          }
         `}
       >
-        <EuiSplitPanel.Inner style={{ flexShrink: 0 }}>
+        <EuiSplitPanel.Inner
+          paddingSize="none"
+          style={{
+            flexShrink: 0,
+          }}
+        >
           {title && (
             <>
-              <EuiTitle size="xs">
-                <h3>{title}</h3>
+              <EuiTitle size="xxs">
+                <h3>
+                  {title}{' '}
+                  {type && (
+                    <EuiBadge
+                      css={css`
+                        ${logicalCSS('margin-left', euiTheme.size.xs)}
+                      `}
+                      color={type.includes(' ') ? 'accent' : 'hollow'}
+                    >
+                      {type}
+                    </EuiBadge>
+                  )}
+                </h3>
               </EuiTitle>
 
               <EuiSpacer />
@@ -66,26 +105,47 @@ export const ThemeExample: FunctionComponent<ThemeExample> = ({
           <EuiText size="s" grow={false}>
             {description}
           </EuiText>
+          {props && (
+            <>
+              <EuiSpacer />
+              <EuiCodeBlock
+                transparentBackground
+                paddingSize="none"
+                language="ts"
+              >
+                {props}
+              </EuiCodeBlock>
+            </>
+          )}
         </EuiSplitPanel.Inner>
+
         {(example || snippet) && (
-          <EuiSplitPanel.Inner>
+          <EuiSplitPanel.Inner
+            paddingSize="none"
+            style={{
+              overflow: 'hidden',
+            }}
+          >
             <EuiSplitPanel.Outer
+              direction="column"
               hasBorder={true}
               hasShadow={false}
-              style={{ overflow: 'hidden' }}
             >
               {example && (
                 <EuiSplitPanel.Inner {...examplePanel}>
                   {example}
                 </EuiSplitPanel.Inner>
               )}
-              <EuiSplitPanel.Inner color="subdued">
+              <EuiSplitPanel.Inner paddingSize="none" color="subdued">
                 {finalSnippet && (
                   <EuiCodeBlock
+                    whiteSpace="pre"
                     isCopyable={true}
-                    paddingSize="none"
+                    paddingSize="m"
                     transparentBackground={true}
-                    language={snippetLanguage || 'jsx'}
+                    language={
+                      snippetLanguage === 'emotion' ? 'jsx' : snippetLanguage
+                    }
                   >
                     {finalSnippet}
                   </EuiCodeBlock>

@@ -13,15 +13,17 @@ import {
   useCallback,
   useContext,
   CSSProperties,
+  MutableRefObject,
 } from 'react';
-import type { VariableSizeGrid as Grid } from 'react-window';
 import { isObject, isNumber } from '../../../services/predicate';
+import { useForceRender, useLatest } from '../../../services';
 import {
   EuiDataGridStyleCellPaddings,
   EuiDataGridStyle,
   EuiDataGridRowHeightOption,
   EuiDataGridRowHeightsOptions,
   EuiDataGridColumn,
+  ImperativeGridApi,
 } from '../data_grid_types';
 import { DataGridSortingContext } from './sorting';
 
@@ -36,6 +38,11 @@ export const AUTO_HEIGHT = 'auto';
 export const DEFAULT_ROW_HEIGHT = 34;
 
 export class RowHeightUtils {
+  constructor(
+    private gridRef: MutableRefObject<ImperativeGridApi | null>,
+    private rerenderGridBodyRef: MutableRefObject<(() => void) | null>
+  ) {}
+
   getRowHeightOption(
     rowIndex: number,
     rowHeightsOptions?: EuiDataGridRowHeightsOptions
@@ -96,8 +103,8 @@ export class RowHeightUtils {
 
   cacheStyles(gridStyles: EuiDataGridStyle) {
     this.styles = {
-      paddingTop: cellPaddingsMap[gridStyles.cellPadding!],
-      paddingBottom: cellPaddingsMap[gridStyles.cellPadding!],
+      paddingTop: cellPaddingsMap[gridStyles.cellPadding || 'm'],
+      paddingBottom: cellPaddingsMap[gridStyles.cellPadding || 'm'],
     };
   }
 
@@ -156,9 +163,7 @@ export class RowHeightUtils {
 
   private heightsCache = new Map<number, Map<string, number>>();
   private timerId?: number;
-  private grid?: Grid;
   private lastUpdatedRow: number = Infinity;
-  private rerenderGridBody: Function = () => {};
 
   isAutoHeight(
     rowIndex: number,
@@ -201,7 +206,10 @@ export class RowHeightUtils {
     rowHeights.set(colId, adaptedHeight);
     this.heightsCache.set(rowIndex, rowHeights);
     this.resetRow(visibleRowIndex);
-    this.rerenderGridBody();
+
+    // When an auto row height is updated, force a re-render
+    // of the grid body to update the unconstrained height
+    this.rerenderGridBodyRef.current?.();
   }
 
   pruneHiddenColumnHeights(visibleColumns: EuiDataGridColumn[]) {
@@ -232,38 +240,47 @@ export class RowHeightUtils {
   }
 
   resetGrid() {
-    this.grid?.resetAfterRowIndex(this.lastUpdatedRow);
+    this.gridRef.current?.resetAfterRowIndex(this.lastUpdatedRow);
     this.lastUpdatedRow = Infinity;
-  }
-
-  setGrid(grid: Grid) {
-    this.grid = grid;
-  }
-
-  setRerenderGridBody(rerenderGridBody: Function) {
-    this.rerenderGridBody = rerenderGridBody;
   }
 }
 
 /**
- * Hook for instantiating RowHeightUtils, and also updating
- * internal vars from outside props via useEffects
+ * Hook for instantiating RowHeightUtils, setting internal class vars,
+ * and setting up various row-height-related side effects
  */
 export const useRowHeightUtils = ({
   gridRef,
   gridStyles,
   columns,
+  rowHeightsOptions,
 }: {
-  gridRef: Grid | null;
+  gridRef: MutableRefObject<ImperativeGridApi | null>;
   gridStyles: EuiDataGridStyle;
   columns: EuiDataGridColumn[];
+  rowHeightsOptions?: EuiDataGridRowHeightsOptions;
 }) => {
-  const rowHeightUtils = useMemo(() => new RowHeightUtils(), []);
+  const forceRenderRef = useLatest(useForceRender());
+  const [rowHeightUtils] = useState(
+    () => new RowHeightUtils(gridRef, forceRenderRef)
+  );
 
-  // Update rowHeightUtils with grid ref
+  // Forces a rerender whenever the row heights change, as this can cause the
+  // grid to change height/have scrollbars. Without this, grid rerendering is stale
   useEffect(() => {
-    if (gridRef) rowHeightUtils.setGrid(gridRef);
-  }, [gridRef, rowHeightUtils]);
+    if (forceRenderRef.current == null) {
+      return;
+    }
+
+    requestAnimationFrame(forceRenderRef.current);
+  }, [
+    // Effects that should cause rerendering
+    rowHeightsOptions?.defaultHeight,
+    rowHeightsOptions?.rowHeights,
+    // Dependencies
+    rowHeightUtils,
+    forceRenderRef,
+  ]);
 
   // Re-cache styles whenever grid density changes
   useEffect(() => {

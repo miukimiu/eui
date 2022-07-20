@@ -9,13 +9,22 @@
 import React from 'react';
 import { mount, render, shallow } from 'enzyme';
 
-import { mockRowHeightUtils } from '../utils/__mocks__/row_heights';
+import { RowHeightUtils } from '../utils/__mocks__/row_heights';
 import { schemaDetectors } from '../utils/data_grid_schema';
-import { providedPopoverContents } from './popover_utils';
 
 import { EuiDataGridBody, Cell } from './data_grid_body';
 
 describe('EuiDataGridBody', () => {
+  const gridRef = {
+    current: {
+      resetAfterColumnIndex: jest.fn(),
+      resetAfterRowIndex: jest.fn(),
+    } as any,
+  };
+  const gridItemsRendered = { current: null };
+  const rerenderGridBodyRef = { current: null };
+  const rowHeightUtils = new RowHeightUtils(gridRef, rerenderGridBodyRef);
+
   const requiredProps = {
     headerIsInteractive: true,
     rowCount: 1,
@@ -40,18 +49,12 @@ describe('EuiDataGridBody', () => {
     setVisibleColumns: jest.fn(),
     switchColumnPos: jest.fn(),
     schemaDetectors,
-    popoverContents: providedPopoverContents,
-    rowHeightUtils: mockRowHeightUtils,
+    rowHeightUtils,
     isFullScreen: false,
     gridStyles: {},
     gridWidth: 300,
-    gridRef: {
-      current: {
-        resetAfterColumnIndex: jest.fn(),
-        resetAfterRowIndex: jest.fn(),
-      } as any,
-    },
-    gridItemsRendered: {} as any,
+    gridRef,
+    gridItemsRendered,
     wrapperRef: { current: document.createElement('div') },
   };
 
@@ -100,6 +103,22 @@ describe('EuiDataGridBody', () => {
     expect(component.find('[data-test-subj="footer"]')).toHaveLength(2);
   });
 
+  it('passes some virtualization options to the underlying react-window grid', () => {
+    const onItemsRendered = jest.fn();
+    const component = mount(
+      <EuiDataGridBody
+        {...requiredProps}
+        virtualizationOptions={{
+          initialScrollTop: 50,
+          className: 'test',
+          onItemsRendered,
+        }}
+      />
+    );
+    expect(component.find('.test').exists()).toBe(true);
+    expect(onItemsRendered).toHaveBeenCalled();
+  });
+
   // TODO: Test final height/weights in Cypress
 
   // TODO: Test tabbing in Cypress
@@ -122,7 +141,6 @@ describe('Cell', () => {
       defaultColumnWidth: 30,
       schema: {},
       schemaDetectors,
-      popoverContents: {},
       interactiveCellId: '',
       renderCellValue: jest.fn(),
     },
@@ -131,15 +149,5 @@ describe('Cell', () => {
   it('is a light wrapper around EuiDataGridCell', () => {
     const component = shallow(<Cell {...requiredProps} />);
     expect(component.find('EuiDataGridCell').exists()).toBe(true);
-  });
-
-  describe('stripes', () => {
-    it('renders odd rows with .euiDataGridRowCell--stripe', () => {
-      const component = shallow(<Cell {...requiredProps} rowIndex={3} />);
-      expect(component.hasClass('euiDataGridRowCell--stripe')).toBe(true);
-
-      component.setProps({ rowIndex: 4 });
-      expect(component.hasClass('euiDataGridRowCell--stripe')).toBe(false);
-    });
   });
 });

@@ -16,6 +16,7 @@ import {
 import { comboBoxKeys } from '../../services';
 
 import { EuiComboBox, EuiComboBoxProps } from './combo_box';
+import type { EuiComboBoxOptionOption } from './types';
 
 jest.mock('../portal', () => ({
   EuiPortal: ({ children }: { children: ReactNode }) => children,
@@ -65,6 +66,17 @@ describe('EuiComboBox', () => {
     const component = render(<EuiComboBox {...requiredProps} />);
 
     expect(component).toMatchSnapshot();
+  });
+
+  test('supports thousands of options in an options group', () => {
+    // tests for a regression: RangeError: Maximum call stack size exceeded
+    // https://mathiasbynens.be/demo/javascript-argument-count
+    const options: EuiComboBoxOptionOption[] = [{ label: 'test', options: [] }];
+    for (let i = 0; i < 250000; i++) {
+      options[0].options?.push({ label: `option ${i}` });
+    }
+
+    mount(<EuiComboBox {...requiredProps} options={options} />);
   });
 });
 
@@ -459,7 +471,7 @@ describe('behavior', () => {
     >(<EuiComboBox options={options} inputRef={inputRefCallback} />);
 
     expect(inputRefCallback).toHaveBeenCalledTimes(1);
-    expect(component.find('input[role="textbox"]').getDOMNode()).toBe(
+    expect(component.find('input[role="combobox"]').getDOMNode()).toBe(
       inputRefCallback.mock.calls[0][0]
     );
   });

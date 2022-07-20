@@ -6,36 +6,52 @@
  * Side Public License, v 1.
  */
 
-import React, { HTMLAttributes, FunctionComponent } from 'react';
-import { CommonProps, keysOf } from '../common';
+import React, { HTMLAttributes, FunctionComponent, CSSProperties } from 'react';
+import { CommonProps } from '../common';
 import classNames from 'classnames';
+import { useEuiTheme } from '../..//services';
+import { useLoadingAriaLabel } from './_loading_strings';
+import { euiLoadingSpinnerStyles } from './loading_spinner.styles';
 
-const sizeToClassNameMap = {
-  s: 'euiLoadingSpinner--small',
-  m: 'euiLoadingSpinner--medium',
-  l: 'euiLoadingSpinner--large',
-  xl: 'euiLoadingSpinner--xLarge',
+export const SIZES = ['s', 'm', 'l', 'xl', 'xxl'] as const;
+export type EuiLoadingSpinnerSize = typeof SIZES[number];
+
+export type EuiLoadingSpinnerColor = {
+  border?: CSSProperties['color'];
+  highlight?: CSSProperties['color'];
 };
 
-export const SIZES = keysOf(sizeToClassNameMap);
-
-export type EuiLoadingSpinnerSize = keyof typeof sizeToClassNameMap;
-
 export type EuiLoadingSpinnerProps = CommonProps &
-  HTMLAttributes<HTMLDivElement> & {
+  Omit<HTMLAttributes<HTMLDivElement>, 'color'> & {
     size?: EuiLoadingSpinnerSize;
+    /**
+     * Sets the color of the border and highlight.
+     * Each key accepts any valid CSS color value as a `string`
+     * See #EuiLoadingSpinnerColor
+     */
+    color?: EuiLoadingSpinnerColor;
   };
 
 export const EuiLoadingSpinner: FunctionComponent<EuiLoadingSpinnerProps> = ({
   size = 'm',
   className,
+  'aria-label': ariaLabel,
+  color,
   ...rest
 }) => {
-  const classes = classNames(
-    'euiLoadingSpinner',
-    sizeToClassNameMap[size],
-    className
-  );
+  const euiTheme = useEuiTheme();
+  const styles = euiLoadingSpinnerStyles(euiTheme, color);
+  const cssStyles = [styles.euiLoadingSpinner, styles[size]];
+  const classes = classNames('euiLoadingSpinner', className);
+  const defaultLabel = useLoadingAriaLabel();
 
-  return <span className={classes} {...rest} />;
+  return (
+    <span
+      className={classes}
+      css={cssStyles}
+      role="progressbar"
+      aria-label={ariaLabel || defaultLabel}
+      {...rest}
+    />
+  );
 };

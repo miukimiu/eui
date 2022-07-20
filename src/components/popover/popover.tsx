@@ -16,7 +16,7 @@ import React, {
   RefCallback,
 } from 'react';
 import classNames from 'classnames';
-import tabbable from 'tabbable';
+import { focusable } from 'tabbable';
 
 import { CommonProps, NoArgCallback } from '../common';
 import { FocusTarget, EuiFocusTrap, EuiFocusTrapProps } from '../focus_trap';
@@ -149,6 +149,13 @@ export interface EuiPopoverProps {
    */
   panelProps?: Omit<EuiPanelProps, 'style'>;
   panelRef?: RefCallback<HTMLElement | null>;
+  /**
+   * Optional screen reader instructions to announce upon popover open,
+   * in addition to EUI's default popover instructions for Escape on close.
+   * Useful for popovers that may have additional keyboard capabilities such as
+   * arrow navigation.
+   */
+  popoverScreenReaderText?: string | ReactNode;
   popoverRef?: Ref<HTMLDivElement>;
   /**
    * When `true`, the popover's position is re-calculated when the user
@@ -281,6 +288,7 @@ function getElementFromInitialFocus(
 }
 
 const returnFocusConfig = { preventScroll: true };
+const closingTransitionTime = 250; // TODO: DRY out var when converting to CSS-in-JS
 
 export type Props = CommonProps &
   HTMLAttributes<HTMLDivElement> &
@@ -346,6 +354,7 @@ export class EuiPopover extends Component<Props, State> {
   }
 
   private respositionTimeout: number | undefined;
+  private strandedFocusTimeout: number | undefined;
   private closingTransitionTimeout: number | undefined;
   private closingTransitionAnimationFrame: number | undefined;
   private updateFocusAnimationFrame: number | undefined;
@@ -383,7 +392,24 @@ export class EuiPopover extends Component<Props, State> {
       event.preventDefault();
       event.stopPropagation();
       this.closePopover();
+      this.handleStrandedFocus();
     }
+  };
+
+  handleStrandedFocus = () => {
+    this.strandedFocusTimeout = window.setTimeout(() => {
+      // If `returnFocus` failed and focus was stranded on the body,
+      // attempt to manually restore focus to the toggle button
+      if (document.activeElement === document.body) {
+        if (!this.button) return;
+
+        const focusableItems = focusable(this.button);
+        if (!focusableItems.length) return;
+
+        const toggleButton = focusableItems[0];
+        toggleButton.focus(returnFocusConfig);
+      }
+    }, closingTransitionTime);
   };
 
   onKeyDown = (event: KeyboardEvent) => {
@@ -419,16 +445,11 @@ export class EuiPopover extends Component<Props, State> {
         return;
       }
 
-      // Otherwise let's focus the first tabbable item and expedite input from the user.
+      // Otherwise focus either `initialFocus` or the panel
       let focusTarget;
 
       if (this.props.initialFocus != null) {
         focusTarget = getElementFromInitialFocus(this.props.initialFocus);
-      } else {
-        const tabbableItems = tabbable(this.panel);
-        if (tabbableItems.length) {
-          focusTarget = tabbableItems[0];
-        }
       }
 
       // there's a race condition between the popover content becoming visible and this function call
@@ -437,7 +458,7 @@ export class EuiPopover extends Component<Props, State> {
       if (focusTarget == null) {
         // there isn't a focus target, one of two reasons:
         // #1 is the whole panel hidden? If so, schedule another check
-        // #2 panel is visible but no tabbables exist, move focus to the panel
+        // #2 panel is visible and no `initialFocus` was set, move focus to the panel
         const panelVisibility = window.getComputedStyle(this.panel).opacity;
         if (panelVisibility === '0') {
           // #1
@@ -463,6 +484,7 @@ export class EuiPopover extends Component<Props, State> {
   }
 
   onOpenPopover = () => {
+    clearTimeout(this.strandedFocusTimeout);
     clearTimeout(this.closingTransitionTimeout);
     if (this.closingTransitionAnimationFrame) {
       cancelAnimationFrame(this.closingTransitionAnimationFrame);
@@ -541,13 +563,14 @@ export class EuiPopover extends Component<Props, State> {
         this.setState({
           isClosing: false,
         });
-      }, 250);
+      }, closingTransitionTime);
     }
   }
 
   componentWillUnmount() {
     window.removeEventListener('scroll', this.positionPopoverFixed, true);
     clearTimeout(this.respositionTimeout);
+    clearTimeout(this.strandedFocusTimeout);
     clearTimeout(this.closingTransitionTimeout);
     cancelAnimationFrame(this.closingTransitionAnimationFrame!);
     cancelAnimationFrame(this.updateFocusAnimationFrame!);
@@ -683,6 +706,7 @@ export class EuiPopover extends Component<Props, State> {
       panelProps,
       panelRef,
       panelStyle,
+      popoverScreenReaderText,
       popoverRef,
       hasArrow,
       arrowChildren,
@@ -691,6 +715,7 @@ export class EuiPopover extends Component<Props, State> {
       initialFocus,
       attachToAnchor,
       display,
+      offset,
       onTrapDeactivation,
       buffer,
       'aria-label': ariaLabel,
@@ -748,15 +773,18 @@ export class EuiPopover extends Component<Props, State> {
       }
 
       let focusTrapScreenReaderText;
-      if (ownFocus) {
+      if (ownFocus || popoverScreenReaderText) {
         ariaDescribedby = this.descriptionId;
         focusTrapScreenReaderText = (
           <EuiScreenReaderOnly>
             <p id={this.descriptionId}>
-              <EuiI18n
-                token="euiPopover.screenReaderAnnouncement"
-                default="You are in a dialog. To close this dialog, hit escape."
-              />
+              {ownFocus && (
+                <EuiI18n
+                  token="euiPopover.screenReaderAnnouncement"
+                  default="You are in a dialog. To close this dialog, hit escape."
+                />
+              )}
+              {popoverScreenReaderText}
             </p>
           </EuiScreenReaderOnly>
         );
@@ -785,6 +813,7 @@ export class EuiPopover extends Component<Props, State> {
           >
             <EuiPanel
               {...(panelProps as EuiPanelProps)}
+              data-popover-panel
               panelRef={this.panelRef}
               className={panelClasses}
               hasShadow={false}

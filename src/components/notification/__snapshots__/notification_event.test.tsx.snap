@@ -49,15 +49,11 @@ exports[`EuiNotificationEvent is rendered 1`] = `
       class="euiNotificationEventMessages"
     >
       <div
-        class="euiText euiText--small"
+        class="euiText emotion-euiText-s-euiTextColor-subdued"
       >
-        <div
-          class="euiTextColor euiTextColor--subdued"
-        >
-          <p>
-            message
-          </p>
-        </div>
+        <p>
+          message
+        </p>
       </div>
     </div>
   </div>
@@ -114,15 +110,11 @@ exports[`EuiNotificationEvent props badgeColor is rendered 1`] = `
       class="euiNotificationEventMessages"
     >
       <div
-        class="euiText euiText--small"
+        class="euiText emotion-euiText-s-euiTextColor-subdued"
       >
-        <div
-          class="euiTextColor euiTextColor--subdued"
-        >
-          <p>
-            message
-          </p>
-        </div>
+        <p>
+          message
+        </p>
       </div>
     </div>
   </div>
@@ -135,50 +127,48 @@ exports[`EuiNotificationEvent props contextMenuItems are rendered 1`] = `
   tabindex="-1"
 >
   <div>
-    <div>
-      <button
-        class="euiContextMenuItem"
-        type="button"
+    <button
+      class="euiContextMenuItem"
+      type="button"
+    >
+      <span
+        class="euiContextMenu__itemLayout"
       >
         <span
-          class="euiContextMenu__itemLayout"
+          class="euiContextMenuItem__text"
         >
-          <span
-            class="euiContextMenuItem__text"
-          >
-            Context menu 1 for id: id
-          </span>
+          Context menu 1 for id: id
         </span>
-      </button>
-      <button
-        class="euiContextMenuItem"
-        type="button"
+      </span>
+    </button>
+    <button
+      class="euiContextMenuItem"
+      type="button"
+    >
+      <span
+        class="euiContextMenu__itemLayout"
       >
         <span
-          class="euiContextMenu__itemLayout"
+          class="euiContextMenuItem__text"
         >
-          <span
-            class="euiContextMenuItem__text"
-          >
-            Context menu 2 for id: id
-          </span>
+          Context menu 2 for id: id
         </span>
-      </button>
-      <button
-        class="euiContextMenuItem"
-        type="button"
+      </span>
+    </button>
+    <button
+      class="euiContextMenuItem"
+      type="button"
+    >
+      <span
+        class="euiContextMenu__itemLayout"
       >
         <span
-          class="euiContextMenu__itemLayout"
+          class="euiContextMenuItem__text"
         >
-          <span
-            class="euiContextMenuItem__text"
-          >
-            Context menu 3 for id: id
-          </span>
+          Context menu 3 for id: id
         </span>
-      </button>
-    </div>
+      </span>
+    </button>
   </div>
 </div>
 `;
@@ -232,15 +222,11 @@ exports[`EuiNotificationEvent props headingLevel is rendered 1`] = `
       class="euiNotificationEventMessages"
     >
       <div
-        class="euiText euiText--small"
+        class="euiText emotion-euiText-s-euiTextColor-subdued"
       >
-        <div
-          class="euiTextColor euiTextColor--subdued"
-        >
-          <p>
-            message
-          </p>
-        </div>
+        <p>
+          message
+        </p>
       </div>
     </div>
   </div>
@@ -262,10 +248,11 @@ exports[`EuiNotificationEvent props iconAriaLabel is rendered 1`] = `
         class="euiNotificationEventMeta__section"
       >
         <span
-          aria-label="my icon aria label"
           class="euiNotificationEventMeta__icon"
           data-euiicon-type="logoCloud"
-        />
+        >
+          my icon aria label
+        </span>
         <span
           class="euiBadge euiBadge--hollow euiBadge--iconLeft euiNotificationEventMeta__badge"
         >
@@ -301,15 +288,11 @@ exports[`EuiNotificationEvent props iconAriaLabel is rendered 1`] = `
       class="euiNotificationEventMessages"
     >
       <div
-        class="euiText euiText--small"
+        class="euiText emotion-euiText-s-euiTextColor-subdued"
       >
-        <div
-          class="euiTextColor euiTextColor--subdued"
-        >
-          <p>
-            message
-          </p>
-        </div>
+        <p>
+          message
+        </p>
       </div>
     </div>
   </div>
@@ -370,15 +353,11 @@ exports[`EuiNotificationEvent props iconType is rendered 1`] = `
       class="euiNotificationEventMessages"
     >
       <div
-        class="euiText euiText--small"
+        class="euiText emotion-euiText-s-euiTextColor-subdued"
       >
-        <div
-          class="euiTextColor euiTextColor--subdued"
-        >
-          <p>
-            message
-          </p>
-        </div>
+        <p>
+          message
+        </p>
       </div>
     </div>
   </div>
@@ -452,15 +431,11 @@ exports[`EuiNotificationEvent props isRead  is rendered 1`] = `
       class="euiNotificationEventMessages"
     >
       <div
-        class="euiText euiText--small"
+        class="euiText emotion-euiText-s-euiTextColor-subdued"
       >
-        <div
-          class="euiTextColor euiTextColor--subdued"
-        >
-          <p>
-            message
-          </p>
-        </div>
+        <p>
+          message
+        </p>
       </div>
     </div>
   </div>
@@ -516,27 +491,23 @@ exports[`EuiNotificationEvent props multiple messages are rendered 1`] = `
       class="euiNotificationEventMessages"
     >
       <div
-        class="euiText euiText--small"
+        class="euiText emotion-euiText-s-euiTextColor-subdued"
       >
-        <div
-          class="euiTextColor euiTextColor--subdued"
-        >
-          <p>
-            message 1
-          </p>
-        </div>
+        <p>
+          message 1
+        </p>
       </div>
       <div
         class="euiAccordion euiNotificationEventMessages__accordion"
       >
         <div
-          class="euiAccordion__triggerWrapper"
+          class="euiAccordion__triggerWrapper emotion-euiAccordion__triggerWrapper"
         >
           <button
             aria-controls="euiNotificationEventMessagesAccordion_generated-id"
             aria-expanded="false"
             aria-label="+ 2 messages for title"
-            class="euiAccordion__button euiNotificationEventMessages__accordionButton"
+            class="euiAccordion__button euiNotificationEventMessages__accordionButton emotion-euiAccordion__button"
             id="generated-id"
             type="button"
           >
@@ -549,39 +520,31 @@ exports[`EuiNotificationEvent props multiple messages are rendered 1`] = `
         </div>
         <div
           aria-labelledby="generated-id"
-          class="euiAccordion__childWrapper"
+          class="euiAccordion__childWrapper emotion-euiAccordion__childWrapper"
           id="euiNotificationEventMessagesAccordion_generated-id"
           role="region"
           tabindex="-1"
         >
           <div>
             <div
-              class=""
+              class=" emotion-euiAccordion__children"
             >
               <div
                 class="euiNotificationEventMessages__accordionContent"
               >
                 <div
-                  class="euiText euiText--small"
+                  class="euiText emotion-euiText-s-euiTextColor-subdued"
                 >
-                  <div
-                    class="euiTextColor euiTextColor--subdued"
-                  >
-                    <p>
-                      message 2
-                    </p>
-                  </div>
+                  <p>
+                    message 2
+                  </p>
                 </div>
                 <div
-                  class="euiText euiText--small"
+                  class="euiText emotion-euiText-s-euiTextColor-subdued"
                 >
-                  <div
-                    class="euiTextColor euiTextColor--subdued"
-                  >
-                    <p>
-                      message 3
-                    </p>
-                  </div>
+                  <p>
+                    message 3
+                  </p>
                 </div>
               </div>
             </div>
@@ -642,15 +605,11 @@ exports[`EuiNotificationEvent props primaryAction is rendered 1`] = `
       class="euiNotificationEventMessages"
     >
       <div
-        class="euiText euiText--small"
+        class="euiText emotion-euiText-s-euiTextColor-subdued"
       >
-        <div
-          class="euiTextColor euiTextColor--subdued"
-        >
-          <p>
-            message
-          </p>
-        </div>
+        <p>
+          message
+        </p>
       </div>
     </div>
     <div
@@ -725,15 +684,11 @@ exports[`EuiNotificationEvent props primaryActionProps is rendered 1`] = `
       class="euiNotificationEventMessages"
     >
       <div
-        class="euiText euiText--small"
+        class="euiText emotion-euiText-s-euiTextColor-subdued"
       >
-        <div
-          class="euiTextColor euiTextColor--subdued"
-        >
-          <p>
-            message
-          </p>
-        </div>
+        <p>
+          message
+        </p>
       </div>
     </div>
     <div
@@ -813,15 +768,11 @@ exports[`EuiNotificationEvent props severity  is rendered 1`] = `
       class="euiNotificationEventMessages"
     >
       <div
-        class="euiText euiText--small"
+        class="euiText emotion-euiText-s-euiTextColor-subdued"
       >
-        <div
-          class="euiTextColor euiTextColor--subdued"
-        >
-          <p>
-            message
-          </p>
-        </div>
+        <p>
+          message
+        </p>
       </div>
     </div>
   </div>

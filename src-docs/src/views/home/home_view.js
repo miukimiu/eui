@@ -34,7 +34,7 @@ export const HomeView = () => (
     color="transparent"
     borderRadius="none"
   >
-    <EuiPageContentBody restrictWidth>
+    <EuiPageContentBody paddingSize="l" restrictWidth>
       <EuiPanel color="subdued" hasShadow={false} paddingSize="none">
         <EuiFlexGroup
           alignItems="center"
@@ -186,7 +186,7 @@ export const HomeView = () => (
         <EuiFlexItem grow={false} className="guideHomePage__blockformCard">
           <EuiCard
             hasBorder
-            href="#/layout/page"
+            href="#/templates/page-template"
             textAlign="left"
             image={imagePages}
             title="Pages"

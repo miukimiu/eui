@@ -13,15 +13,16 @@ import {
 import {
   fontWeight,
   fontScale,
-} from '../../../../../src/global_styling/variables/_typography';
+} from '../../../../../src/themes/amsterdam/global_styling/variables/_typography';
 
+import { getPropsFromComponent } from '../../../services/props/get_props';
 import { ThemeValue } from './_values';
 
 import {
-  getPropsFromThemeKey,
   EuiThemeFontBase,
   EuiThemeFontWeight,
   EuiThemeFontScale,
+  EuiThemeBody,
 } from '../_props';
 
 import { useDebouncedUpdate } from '../hooks';
@@ -49,12 +50,14 @@ export default ({ onThemeUpdate }) => {
     onUpdate: onThemeUpdate,
   });
 
-  const baseProps = getPropsFromThemeKey(EuiThemeFontBase);
-  const weightProps = getPropsFromThemeKey(EuiThemeFontWeight);
-  const scaleProps = getPropsFromThemeKey(EuiThemeFontScale);
+  const baseProps = getPropsFromComponent(EuiThemeFontBase);
+  const weightProps = getPropsFromComponent(EuiThemeFontWeight);
+  const scaleProps = getPropsFromComponent(EuiThemeFontScale);
+  const bodyProps = getPropsFromComponent(EuiThemeBody);
 
   const fontFamilies = fontClone.family.split(',');
   const codeFontFamilies = fontClone.familyCode.split(',');
+  const serifFontFamilies = fontClone.familySerif.split(',');
 
   return (
     <div>
@@ -110,6 +113,23 @@ export default ({ onThemeUpdate }) => {
             const out = [...codeFontFamilies];
             out.splice(0, 1, value);
             updateFont('familyCode', out.join(','));
+          }}
+          stringProps={{
+            style: { width: 200 },
+          }}
+        />
+
+        <EuiSpacer />
+
+        <ThemeValue
+          property={'font'}
+          type={baseProps.familySerif}
+          name={'familySerif'}
+          value={serifFontFamilies[0]}
+          onUpdate={(value) => {
+            const out = [...serifFontFamilies];
+            out.splice(0, 1, value);
+            updateFont('familySerif', out.join(','));
           }}
           stringProps={{
             style: { width: 200 },
@@ -200,8 +220,8 @@ export default ({ onThemeUpdate }) => {
         <EuiText size="s" grow={false}>
           <p>
             This typographic scale is used to calculate the font sizes which are
-            multiplied against the <EuiCode>base</EuiCode> value and convertd to
-            pixel and/or rem values.
+            multiplied against the <EuiCode>base</EuiCode> value and converted
+            to pixel and/or rem values.
           </p>
         </EuiText>
 
@@ -225,6 +245,61 @@ export default ({ onThemeUpdate }) => {
             groupProps={{ alignItems: 'center' }}
           />
         ))}
+      </EuiPanel>
+
+      <EuiSpacer size="xl" />
+
+      <EuiPanel color="subdued">
+        <EuiTitle size="xs">
+          <h3>
+            <code>_EuiThemeFontBody</code>
+          </h3>
+        </EuiTitle>
+        <EuiSpacer size="s" />
+        <EuiText size="s" grow={false}>
+          <p>
+            The <EuiCode>body.scale</EuiCode> value determines the base
+            font-size at which every font-size is calculated against.
+          </p>
+        </EuiText>
+
+        <EuiSpacer />
+
+        <ThemeValue
+          property="font.body"
+          type={bodyProps.scale}
+          name={'scale'}
+          value={fontClone.body.scale}
+          buttonStyle={css`
+            font-size: ${scaleClone.scale[fontClone.body.scale] *
+            euiTheme.base}px;
+            min-width: calc(${euiTheme.size.xxl} * 3);
+            text-align: left;
+          `}
+          example={`${
+            scaleClone.scale[fontClone.body.scale] * euiTheme.base
+          }px`}
+          // onUpdate={(value) => updateScale(key, value)}
+          // numberProps={{ step: 0.1, style: { width: '6em' } }}
+          groupProps={{ alignItems: 'center' }}
+        />
+        <EuiSpacer />
+
+        <ThemeValue
+          property="font.body"
+          type={bodyProps.weight}
+          name={'weight'}
+          value={fontClone.body.weight}
+          buttonStyle={css`
+            font-weight: ${weightClone.weight[fontClone.body.weight]};
+            min-width: calc(${euiTheme.size.xxl} * 3);
+            text-align: left;
+          `}
+          example={weightClone.weight[fontClone.body.weight]}
+          // onUpdate={(value) => updateScale(key, value)}
+          // numberProps={{ step: 0.1, style: { width: '6em' } }}
+          groupProps={{ alignItems: 'center' }}
+        />
       </EuiPanel>
     </div>
   );

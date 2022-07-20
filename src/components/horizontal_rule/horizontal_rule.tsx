@@ -10,9 +10,14 @@ import React, { FunctionComponent, HTMLAttributes } from 'react';
 import classNames from 'classnames';
 
 import { CommonProps } from '../common';
+import { useEuiTheme } from '../../services';
+import { euiHorizontalRuleStyles } from './horizontal_rule.styles';
 
-export type EuiHorizontalRuleSize = keyof typeof sizeToClassNameMap;
-export type EuiHorizontalRuleMargin = keyof typeof marginToClassNameMap;
+export const SIZES = ['full', 'half', 'quarter'] as const;
+export const MARGINS = ['none', 'xs', 's', 'm', 'l', 'xl', 'xxl'] as const;
+
+export type EuiHorizontalRuleSize = typeof SIZES[number];
+export type EuiHorizontalRuleMargin = typeof MARGINS[number];
 
 export interface EuiHorizontalRuleProps
   extends CommonProps,
@@ -24,25 +29,17 @@ export interface EuiHorizontalRuleProps
   margin?: EuiHorizontalRuleMargin;
 }
 
-const sizeToClassNameMap = {
-  full: 'euiHorizontalRule--full',
-  half: 'euiHorizontalRule--half',
-  quarter: 'euiHorizontalRule--quarter',
-};
-
-export const SIZES = Object.keys(sizeToClassNameMap);
-
-const marginToClassNameMap = {
+const marginToClassNameMap: {
+  [value in EuiHorizontalRuleMargin]: string | null;
+} = {
   none: null,
-  xs: 'euiHorizontalRule--marginXSmall',
-  s: 'euiHorizontalRule--marginSmall',
-  m: 'euiHorizontalRule--marginMedium',
-  l: 'euiHorizontalRule--marginLarge',
-  xl: 'euiHorizontalRule--marginXLarge',
-  xxl: 'euiHorizontalRule--marginXXLarge',
+  xs: 'marginXSmall',
+  s: 'marginSmall',
+  m: 'marginMedium',
+  l: 'marginLarge',
+  xl: 'marginXLarge',
+  xxl: 'marginXXLarge',
 };
-
-export const MARGINS = Object.keys(marginToClassNameMap);
 
 export const EuiHorizontalRule: FunctionComponent<EuiHorizontalRuleProps> = ({
   className,
@@ -50,12 +47,20 @@ export const EuiHorizontalRule: FunctionComponent<EuiHorizontalRuleProps> = ({
   margin = 'l',
   ...rest
 }) => {
+  const euiTheme = useEuiTheme();
+  const styles = euiHorizontalRuleStyles(euiTheme);
+
   const classes = classNames(
     'euiHorizontalRule',
-    sizeToClassNameMap[size],
-    marginToClassNameMap[margin],
+    {
+      [`euiHorizontalRule--${size}`]: size,
+      [`euiHorizontalRule--${marginToClassNameMap[margin]}`]:
+        margin && margin !== 'none',
+    },
     className
   );
 
-  return <hr className={classes} {...rest} />;
+  const cssStyles = [styles.euiHorizontalRule, styles[size], styles[margin]];
+
+  return <hr css={cssStyles} className={classes} {...rest} />;
 };

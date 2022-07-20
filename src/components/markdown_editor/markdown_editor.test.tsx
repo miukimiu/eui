@@ -91,6 +91,23 @@ describe('EuiMarkdownEditor', () => {
         expect(component).toMatchSnapshot();
       });
     });
+
+    describe('readOnly', () => {
+      test('is set to true', () => {
+        const component = render(
+          <EuiMarkdownEditor
+            editorId="editorId"
+            autoExpandPreview={false}
+            value=""
+            onChange={() => null}
+            readOnly
+            {...requiredProps}
+          />
+        );
+
+        expect(component).toMatchSnapshot();
+      });
+    });
   });
 
   test('is preview rendered', () => {
@@ -103,16 +120,10 @@ describe('EuiMarkdownEditor', () => {
       />
     );
     component.find('EuiButtonEmpty').simulate('click');
+    const rendered = component.render();
     expect(
-      component
-        .find('EuiText.euiMarkdownFormat')
-        .childAt(0)
-        .childAt(0)
-        .matchesElement(<h2>Hello world</h2>)
-    );
-    expect(
-      component.find('EuiText.euiMarkdownFormat').childAt(0).childAt(0).text()
-    ).toBe('Hello world');
+      rendered.find('.euiText.euiMarkdownFormat').find('h2').text()
+    ).toEqual('Hello world');
   });
 
   test('modal with help syntax is rendered', () => {
@@ -124,11 +135,13 @@ describe('EuiMarkdownEditor', () => {
         {...requiredProps}
       />
     );
+    expect(component.find('EuiModal').length).toBe(0);
+
     component
       .find('EuiButtonIcon.euiMarkdownEditorFooter__helpButton')
       .simulate('click');
 
-    expect(component).toMatchSnapshot();
+    expect(component.find('EuiModal').length).toBe(1);
   });
 
   test('custom plugins are excluded and popover is rendered', () => {
@@ -153,7 +166,7 @@ describe('EuiMarkdownEditor', () => {
       .find('EuiButtonIcon.euiMarkdownEditorFooter__helpButton')
       .simulate('click');
 
-    expect(component).toMatchSnapshot();
+    expect(component.render()).toMatchSnapshot();
   });
 
   test('fires onChange on text area change', () => {

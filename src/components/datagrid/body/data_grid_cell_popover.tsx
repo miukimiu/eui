@@ -10,7 +10,10 @@ import React, { createContext, useState, useCallback, ReactNode } from 'react';
 
 import { keys } from '../../../services';
 import { EuiWrappingPopover } from '../../popover';
-import { DataGridCellPopoverContextShape } from '../data_grid_types';
+import {
+  DataGridCellPopoverContextShape,
+  EuiDataGridCellPopoverElementProps,
+} from '../data_grid_types';
 
 export const DataGridCellPopoverContext = createContext<
   DataGridCellPopoverContextShape
@@ -70,22 +73,23 @@ export const useCellPopover = (): {
   // Note that this popover is rendered once at the top grid level, rather than one popover per cell
   const cellPopover = popoverIsOpen && popoverAnchor && (
     <EuiWrappingPopover
-      hasArrow={false}
-      anchorClassName="euiDataGridRowCell__expand"
-      button={popoverAnchor}
       isOpen={popoverIsOpen}
-      panelClassName="euiDataGridRowCell__popover"
-      panelPaddingSize="s"
+      button={popoverAnchor}
       display="block"
-      closePopover={closeCellPopover}
+      hasArrow={false}
+      panelPaddingSize="s"
+      panelClassName="euiDataGridRowCell__popover"
       panelProps={{
         'data-test-subj': 'euiDataGridExpansionPopover',
       }}
+      closePopover={closeCellPopover}
       onKeyDown={(event) => {
         if (event.key === keys.F2 || event.key === keys.ESCAPE) {
           event.preventDefault();
           event.stopPropagation();
           closeCellPopover();
+          // Ensure focus is returned to the parent cell
+          requestAnimationFrame(() => popoverAnchor.parentElement!.focus());
         }
       }}
     >
@@ -94,4 +98,52 @@ export const useCellPopover = (): {
   );
 
   return { cellPopoverContext, cellPopover };
+};
+
+/**
+ * Popover content renderers
+ */
+import { EuiText } from '../../text';
+import { EuiCodeBlock } from '../../code';
+
+export const DefaultCellPopover = ({
+  schema,
+  cellActions,
+  children,
+  cellContentsElement,
+}: EuiDataGridCellPopoverElementProps) => {
+  switch (schema) {
+    case 'json':
+      return (
+        <>
+          <JsonPopoverContent cellText={cellContentsElement.innerText} />
+          {cellActions}
+        </>
+      );
+    default:
+      return (
+        <>
+          <EuiText>{children}</EuiText>
+          {cellActions}
+        </>
+      );
+  }
+};
+
+export const JsonPopoverContent = ({ cellText }: { cellText: string }) => {
+  let formattedText = cellText;
+  try {
+    formattedText = JSON.stringify(JSON.parse(formattedText), null, 2);
+  } catch (e) {} // eslint-disable-line no-empty
+
+  return (
+    <EuiCodeBlock
+      isCopyable
+      transparentBackground
+      paddingSize="none"
+      language="json"
+    >
+      {formattedText}
+    </EuiCodeBlock>
+  );
 };

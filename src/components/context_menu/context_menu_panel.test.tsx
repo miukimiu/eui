@@ -8,13 +8,11 @@
 
 import React from 'react';
 import { render, mount } from 'enzyme';
-import { findTestSubject, requiredProps } from '../../test';
+import { requiredProps } from '../../test';
 
 import { EuiContextMenuPanel, SIZES } from './context_menu_panel';
 
 import { EuiContextMenuItem } from './context_menu_item';
-
-import { tick } from './context_menu.test';
 
 import { keys } from '../../services';
 
@@ -162,30 +160,6 @@ describe('EuiContextMenuPanel', () => {
       });
     });
 
-    describe('initialFocusedItemIndex', () => {
-      it('sets focus on the item occupying that index', async () => {
-        const component = mount(
-          <EuiContextMenuPanel items={items} initialFocusedItemIndex={1} />
-        );
-
-        await tick(20);
-
-        expect(findTestSubject(component, 'itemB').getDOMNode()).toBe(
-          document.activeElement
-        );
-      });
-
-      it('sets focus on the panel when set to `-1`', async () => {
-        const component = mount(
-          <EuiContextMenuPanel items={items} initialFocusedItemIndex={-1} />
-        );
-
-        await tick(20);
-
-        expect(component.getDOMNode()).toBe(document.activeElement);
-      });
-    });
-
     describe('onUseKeyboardToNavigate', () => {
       it('is called when up arrow is pressed', () => {
         const onUseKeyboardToNavigateHandler = jest.fn();
@@ -216,12 +190,13 @@ describe('EuiContextMenuPanel', () => {
       });
 
       describe('left arrow', () => {
-        it('calls handler if showPreviousPanel exists', () => {
+        it('calls handler if onClose and showPreviousPanel exists', () => {
           const onUseKeyboardToNavigateHandler = jest.fn();
 
           const component = mount(
             <EuiContextMenuPanel
               items={items}
+              onClose={() => {}}
               showPreviousPanel={() => {}}
               onUseKeyboardToNavigate={onUseKeyboardToNavigateHandler}
             />
@@ -280,96 +255,4 @@ describe('EuiContextMenuPanel', () => {
   });
 
   // @see Cypress context_menu_panel.spec.tsx for focus & keyboard nav testing
-
-  describe('updating items and content', () => {
-    describe('updates to items', () => {
-      it("should not re-render if any items's watchedItemProps did not change", () => {
-        expect.assertions(2); // make sure the assertion in the `setProps` callback is executed
-
-        // by not passing `watchedItemProps` no changes to items should cause a re-render
-        const component = mount(
-          <EuiContextMenuPanel
-            items={[
-              <EuiContextMenuItem key="A" data-counter={0}>
-                Option A
-              </EuiContextMenuItem>,
-              <EuiContextMenuItem key="B" data-counter={1}>
-                Option B
-              </EuiContextMenuItem>,
-            ]}
-          />
-        );
-
-        expect(component.debug()).toMatchSnapshot();
-
-        component.setProps(
-          {
-            items: [
-              <EuiContextMenuItem key="A" data-counter={2}>
-                Option A
-              </EuiContextMenuItem>,
-              <EuiContextMenuItem key="B" data-counter={3}>
-                Option B
-              </EuiContextMenuItem>,
-            ],
-          },
-          () => {
-            expect(component.debug()).toMatchSnapshot();
-          }
-        );
-      });
-
-      it("should re-render if any items's watchedItemProps did change", () => {
-        expect.assertions(2); // make sure the assertion in the `setProps` callback is executed
-
-        // by referencing the `data-counter` property in `watchedItemProps`
-        // changes to the items should be picked up and re-rendered
-        const component = mount(
-          <EuiContextMenuPanel
-            watchedItemProps={['data-counter']}
-            items={[
-              <EuiContextMenuItem key="A" data-counter={0}>
-                Option A
-              </EuiContextMenuItem>,
-              <EuiContextMenuItem key="B" data-counter={1}>
-                Option B
-              </EuiContextMenuItem>,
-            ]}
-          />
-        );
-
-        expect(component.debug()).toMatchSnapshot();
-
-        component.setProps(
-          {
-            items: [
-              <EuiContextMenuItem key="A" data-counter={2}>
-                Option A
-              </EuiContextMenuItem>,
-              <EuiContextMenuItem key="B" data-counter={3}>
-                Option B
-              </EuiContextMenuItem>,
-            ],
-          },
-          () => {
-            expect(component.debug()).toMatchSnapshot();
-          }
-        );
-      });
-
-      it('should re-render at all times when children exists', () => {
-        expect.assertions(2); // make sure the assertion in the `setProps` callback is executed
-
-        const component = mount(
-          <EuiContextMenuPanel>Hello World</EuiContextMenuPanel>
-        );
-
-        expect(component.debug()).toMatchSnapshot();
-
-        component.setProps({ children: 'More Salutations' }, () => {
-          expect(component.debug()).toMatchSnapshot();
-        });
-      });
-    });
-  });
 });

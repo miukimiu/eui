@@ -6,16 +6,21 @@
  * Side Public License, v 1.
  */
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { mount, render, ReactWrapper } from 'enzyme';
 import { keys } from '../../../services';
-import { mockRowHeightUtils } from '../utils/__mocks__/row_heights';
+import { RowHeightUtils } from '../utils/__mocks__/row_heights';
 import { mockFocusContext } from '../utils/__mocks__/focus_context';
 import { DataGridFocusContext } from '../utils/focus';
 
 import { EuiDataGridCell } from './data_grid_cell';
 
 describe('EuiDataGridCell', () => {
+  const mockRowHeightUtils = new RowHeightUtils(
+    { current: null },
+    { current: null }
+  );
+
   const mockPopoverContext = {
     popoverIsOpen: false,
     cellLocation: { rowIndex: 0, colIndex: 0 },
@@ -37,9 +42,6 @@ describe('EuiDataGridCell', () => {
         <button data-datagrid-interactable="true">world</button>
       </div>
     ),
-    popoverContent: ({ children }: { children: React.ReactNode }) => (
-      <div data-test-subj="popover-test">{children}</div>
-    ),
     popoverContext: mockPopoverContext,
     rowHeightUtils: mockRowHeightUtils,
   };
@@ -47,11 +49,28 @@ describe('EuiDataGridCell', () => {
   beforeEach(() => jest.clearAllMocks());
 
   it('renders', () => {
-    const component = mount(<EuiDataGridCell {...requiredProps} />);
+    const component = render(<EuiDataGridCell {...requiredProps} />);
     expect(component).toMatchSnapshot();
   });
 
-  it('renders cell buttons', () => {
+  it("renders the cell's `aria-rowindex` correctly when paginated on a different page", () => {
+    const component = mount(
+      <EuiDataGridCell
+        {...requiredProps}
+        pagination={{
+          pageIndex: 3,
+          pageSize: 20,
+          onChangePage: () => {},
+          onChangeItemsPerPage: () => {},
+        }}
+      />
+    );
+    expect(
+      component.find('[data-test-subj="dataGridRowCell"]').prop('aria-rowindex')
+    ).toEqual(61);
+  });
+
+  it('renders cell actions', () => {
     const component = mount(
       <EuiDataGridCell
         {...requiredProps}
@@ -64,11 +83,11 @@ describe('EuiDataGridCell', () => {
     );
     component.setState({ enableInteractions: true });
 
-    const getCellButtons = () => component.find('EuiDataGridCellButtons');
-    expect(getCellButtons()).toHaveLength(1);
+    const getCellActions = () => component.find('EuiDataGridCellActions');
+    expect(getCellActions()).toHaveLength(1);
 
     // Should handle opening the popover
-    (getCellButtons().prop('onExpandClick') as Function)();
+    (getCellActions().prop('onExpandClick') as Function)();
     expect(mockPopoverContext.openCellPopover).toHaveBeenCalled();
 
     // Should handle closing the popover
@@ -76,10 +95,8 @@ describe('EuiDataGridCell', () => {
       isExpandable: true,
       popoverContext: { ...mockPopoverContext, popoverIsOpen: true },
     });
-    (getCellButtons().prop('onExpandClick') as Function)();
+    (getCellActions().prop('onExpandClick') as Function)();
     expect(mockPopoverContext.closeCellPopover).toHaveBeenCalledTimes(1);
-    (getCellButtons().prop('closePopover') as Function)();
-    expect(mockPopoverContext.closeCellPopover).toHaveBeenCalledTimes(2);
   });
 
   describe('shouldComponentUpdate', () => {
@@ -127,11 +144,11 @@ describe('EuiDataGridCell', () => {
         it('renderCellValue', () => {
           component.setProps({ renderCellValue: () => <div>test</div> });
         });
+        it('renderCellPopover', () => {
+          component.setProps({ renderCellPopover: () => <div>test</div> });
+        });
         it('interactiveCellId', () => {
           component.setProps({ interactiveCellId: 'test' });
-        });
-        it('popoverContent', () => {
-          component.setProps({ popoverContent: () => <div>test</div> });
         });
         it('popoverContext.popoverIsOpen', () => {
           component.setProps({
@@ -183,12 +200,17 @@ describe('EuiDataGridCell', () => {
   });
 
   describe('componentDidUpdate', () => {
-    it('resets cell props when the cell columnId changes', () => {
+    it('resets cell props when the cell is moved (columnId) or sorted (rowIndex)', () => {
       const setState = jest.spyOn(EuiDataGridCell.prototype, 'setState');
       const component = mount(<EuiDataGridCell {...requiredProps} />);
 
       component.setProps({ columnId: 'newColumnId' });
       expect(setState).toHaveBeenCalledWith({ cellProps: {} });
+      expect(setState).toHaveBeenCalledTimes(1);
+
+      component.setProps({ rowIndex: 1 });
+      expect(setState).toHaveBeenCalledWith({ cellProps: {} });
+      expect(setState).toHaveBeenCalledTimes(2);
     });
 
     it("handles the cell popover by forwarding the cell's DOM node and contents to the parent popover context", () => {
@@ -385,6 +407,48 @@ describe('EuiDataGridCell', () => {
         <EuiDataGridCell {...props} isExpandable={false} />
       );
       expect((component.instance() as any).isPopoverOpen()).toEqual(false);
+    });
+  });
+
+  describe('isExpandable', () => {
+    it('always returns true if column.cellActions exists', () => {
+      const component = mount(
+        <EuiDataGridCell
+          {...requiredProps}
+          column={{ id: 'someId', cellActions: [() => <button />] }}
+          isExpandable={false}
+        />
+      );
+
+      expect(component.find('renderCellValue').prop('isExpandable')).toBe(true);
+    });
+
+    it('falls back to props.isExpandable which is derived from the column config', () => {
+      const component = mount(
+        <EuiDataGridCell {...requiredProps} isExpandable={true} />
+      );
+
+      expect(component.find('renderCellValue').prop('isExpandable')).toBe(true);
+    });
+
+    it('allows overriding column.isExpandable with setCellProps({ isExpandable })', () => {
+      const RenderCellValue = ({ setCellProps }: any) => {
+        useEffect(() => {
+          setCellProps({ isExpandable: false });
+        }, [setCellProps]);
+        return 'cell render';
+      };
+      const component = mount(
+        <EuiDataGridCell
+          {...requiredProps}
+          isExpandable={true}
+          renderCellValue={RenderCellValue}
+        />
+      );
+
+      expect(component.find('RenderCellValue').prop('isExpandable')).toBe(
+        false
+      );
     });
   });
 

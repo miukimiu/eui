@@ -11,15 +11,16 @@ import { FocusOn } from 'react-focus-on';
 import { ReactFocusOnProps } from 'react-focus-on/dist/es5/types';
 
 import { CommonProps } from '../common';
+import { findElementBySelectorOrRef, ElementTarget } from '../../services';
 
-/**
- * A DOM node, a selector string (which will be passed to
- * `document.querySelector()` to find the DOM node), or a function that
- * returns a DOM node.
- */
-export type FocusTarget = HTMLElement | string | (() => HTMLElement);
+export type FocusTarget = ElementTarget;
 
 interface EuiFocusTrapInterface {
+  /**
+   * Whether `onClickOutside` should be called on mouseup instead of mousedown.
+   * This flag can be used to prevent conflicts with outside toggle buttons by delaying the closing click callback.
+   */
+  closeOnMouseup?: boolean;
   /**
    * Clicking outside the trap area will disable the trap
    */
@@ -68,27 +69,43 @@ export class EuiFocusTrap extends Component<EuiFocusTrapProps, State> {
     }
   }
 
+  componentWillUnmount() {
+    this.removeMouseupListener();
+  }
+
   // Programmatically sets focus on a nested DOM node; optional
   setInitialFocus = (initialFocus?: FocusTarget) => {
-    let node = initialFocus instanceof HTMLElement ? initialFocus : null;
-    if (typeof initialFocus === 'string') {
-      node = document.querySelector(initialFocus as string);
-    } else if (typeof initialFocus === 'function') {
-      node = (initialFocus as () => HTMLElement)();
-    }
+    const node = findElementBySelectorOrRef(initialFocus);
     if (!node) return;
     // `data-autofocus` is part of the 'react-focus-on' API
     node.setAttribute('data-autofocus', 'true');
   };
 
-  handleOutsideClick: ReactFocusOnProps['onClickOutside'] = (...args) => {
-    const { onClickOutside, clickOutsideDisables } = this.props;
+  onMouseupOutside = (e: MouseEvent | TouchEvent) => {
+    this.removeMouseupListener();
+    // Timeout gives precedence to the consumer to initiate close if it has toggle behavior.
+    // Otherwise this event may occur first and the consumer toggle will reopen the flyout.
+    setTimeout(() => this.props.onClickOutside?.(e));
+  };
+
+  addMouseupListener = () => {
+    document.addEventListener('mouseup', this.onMouseupOutside);
+    document.addEventListener('touchend', this.onMouseupOutside);
+  };
+
+  removeMouseupListener = () => {
+    document.removeEventListener('mouseup', this.onMouseupOutside);
+    document.removeEventListener('touchend', this.onMouseupOutside);
+  };
+
+  handleOutsideClick: ReactFocusOnProps['onClickOutside'] = (event) => {
+    const { onClickOutside, clickOutsideDisables, closeOnMouseup } = this.props;
     if (clickOutsideDisables) {
       this.setState({ hasBeenDisabledByClick: true });
     }
 
     if (onClickOutside) {
-      onClickOutside(...args);
+      closeOnMouseup ? this.addMouseupListener() : onClickOutside(event);
     }
   };
 

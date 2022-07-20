@@ -44,7 +44,6 @@ import {
 
 import { EuiModal } from '../modal';
 import { ContextShape, EuiMarkdownContext } from './markdown_context';
-import * as MarkdownTooltip from './plugins/markdown_tooltip';
 import {
   defaultParsingPlugins,
   defaultProcessingPlugins,
@@ -76,6 +75,11 @@ type CommonMarkdownEditorProps = Omit<
 
     /** callback function when markdown content is modified */
     onChange: (value: string) => void;
+
+    /**
+     * Sets the current display mode to a read-only state. All editing gets resctricted.
+     */
+    readOnly?: ContextShape['readOnly'];
 
     /**
      * Sets the `height` in pixels of the editor/preview area or pass `full` to allow
@@ -209,6 +213,7 @@ export const EuiMarkdownEditor = forwardRef<
       dropHandlers = [],
       markdownFormatProps,
       placeholder,
+      readOnly,
       ...rest
     },
     ref
@@ -221,13 +226,6 @@ export const EuiMarkdownEditor = forwardRef<
     >(undefined);
 
     const toolbarPlugins = [...uiPlugins];
-    // @ts-ignore __originatedFromEui is a custom property
-    if (!uiPlugins.__originatedFromEui) {
-      toolbarPlugins.unshift(MarkdownTooltip.plugin);
-      console.warn(
-        'Deprecation warning: uiPlugins passed to EuiMarkdownEditor does not include the tooltip plugin, which has been added for you. This automatic inclusion has been deprecated and will be removed in the future, see https://github.com/elastic/eui/pull/4383'
-      );
-    }
 
     const markdownActions = useMemo(
       () => new MarkdownActions(editorId, toolbarPlugins),
@@ -272,11 +270,14 @@ export const EuiMarkdownEditor = forwardRef<
 
     const contextValue = useMemo<ContextShape>(
       () => ({
-        openPluginEditor: (plugin: EuiMarkdownEditorUiPlugin) =>
-          setPluginEditorPlugin(() => plugin),
-        replaceNode,
+        openPluginEditor: readOnly
+          ? () => {}
+          : (plugin: EuiMarkdownEditorUiPlugin) =>
+              setPluginEditorPlugin(() => plugin),
+        replaceNode: readOnly ? () => {} : replaceNode,
+        readOnly: readOnly,
       }),
-      [replaceNode]
+      [replaceNode, readOnly]
     );
 
     const [selectedNode, setSelectedNode] = useState<EuiMarkdownAstNode>();
@@ -297,6 +298,7 @@ export const EuiMarkdownEditor = forwardRef<
             for (let i = 0; i < node.children.length; i++) {
               const child = node.children[i];
               if (
+                child.position &&
                 child.position.start.offset < selectionStart &&
                 selectionStart < child.position.end.offset
               ) {
@@ -311,6 +313,9 @@ export const EuiMarkdownEditor = forwardRef<
 
         setSelectedNode(node);
       };
+      // `parsed` changed, which means the node at the cursor may be different
+      // e.g. from clicking a toolbar button
+      getCursorNode();
 
       const textarea = textareaRef.current!;
 
@@ -353,6 +358,10 @@ export const EuiMarkdownEditor = forwardRef<
       },
       className
     );
+
+    const classesPreview = classNames('euiMarkdownEditorPreview', {
+      'euiMarkdownEditorPreview-isReadOnly': readOnly,
+    });
 
     const onResize = () => {
       if (textarea && isEditing && height !== 'full') {
@@ -423,7 +432,7 @@ export const EuiMarkdownEditor = forwardRef<
           {isPreviewing && (
             <div
               ref={previewRef}
-              className="euiMarkdownEditorPreview"
+              className={classesPreview}
               style={{ height: previewHeight }}
             >
               <EuiMarkdownFormat
@@ -481,6 +490,7 @@ export const EuiMarkdownEditor = forwardRef<
                       value={value}
                       onFocus={() => setHasUnacceptedItems(false)}
                       placeholder={placeholder}
+                      readOnly={readOnly}
                       {...{
                         'aria-label': ariaLabel,
                         'aria-labelledby': ariaLabelledBy,
@@ -504,7 +514,8 @@ export const EuiMarkdownEditor = forwardRef<
                   onSave: (markdown, config) => {
                     if (
                       selectedNode &&
-                      selectedNode.type === pluginEditorPlugin.name
+                      selectedNode.type === pluginEditorPlugin.name &&
+                      selectedNode.position
                     ) {
                       // modifying an existing node
                       textareaRef.current!.setSelectionRange(

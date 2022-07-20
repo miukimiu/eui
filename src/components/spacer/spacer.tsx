@@ -10,19 +10,12 @@ import React, { FunctionComponent, HTMLAttributes } from 'react';
 import classNames from 'classnames';
 
 import { CommonProps } from '../common';
+import { useEuiTheme } from '../../services';
 
-const sizeToClassNameMap = {
-  xs: 'euiSpacer--xs',
-  s: 'euiSpacer--s',
-  m: 'euiSpacer--m',
-  l: 'euiSpacer--l',
-  xl: 'euiSpacer--xl',
-  xxl: 'euiSpacer--xxl',
-};
+import { euiSpacerStyles } from './spacer.styles';
 
-export const SIZES = Object.keys(sizeToClassNameMap);
-
-export type SpacerSize = keyof typeof sizeToClassNameMap;
+export const SIZES = ['xs', 's', 'm', 'l', 'xl', 'xxl'] as const;
+export type SpacerSize = typeof SIZES[number];
 
 export type EuiSpacerProps = HTMLAttributes<HTMLDivElement> &
   CommonProps & {
@@ -34,7 +27,15 @@ export const EuiSpacer: FunctionComponent<EuiSpacerProps> = ({
   size = 'l',
   ...rest
 }) => {
-  const classes = classNames('euiSpacer', sizeToClassNameMap[size], className);
+  const euiTheme = useEuiTheme();
+  const styles = euiSpacerStyles(euiTheme);
+  const classes = classNames(
+    'euiSpacer',
+    { [`euiSpacer--${size}`]: size },
+    className
+  );
 
-  return <div className={classes} {...rest} />;
+  const cssStyles = [styles.euiSpacer, styles[size]];
+
+  return <div className={classes} css={cssStyles} {...rest} />;
 };

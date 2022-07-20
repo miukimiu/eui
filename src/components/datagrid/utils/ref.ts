@@ -6,7 +6,8 @@
  * Side Public License, v 1.
  */
 
-import { useImperativeHandle, useCallback, Ref } from 'react';
+import { useImperativeHandle, useCallback, Ref, RefObject } from 'react';
+import type { VariableSizeGrid } from 'react-window';
 import {
   EuiDataGridRefProps,
   EuiDataGridProps,
@@ -17,6 +18,7 @@ import {
 
 interface Dependencies {
   ref: Ref<unknown>;
+  gridRef: RefObject<VariableSizeGrid>;
   setIsFullScreen: EuiDataGridRefProps['setIsFullScreen'];
   focusContext: DataGridFocusContextShape;
   cellPopoverContext: DataGridCellPopoverContextShape;
@@ -28,6 +30,7 @@ interface Dependencies {
 
 export const useImperativeGridRef = ({
   ref,
+  gridRef,
   setIsFullScreen,
   focusContext,
   cellPopoverContext,
@@ -75,16 +78,35 @@ export const useImperativeGridRef = ({
     [_openCellPopover, checkCellExists, findVisibleRowIndex]
   );
 
+  const scrollTo = useCallback<VariableSizeGrid['scrollTo']>(
+    (...args) => gridRef.current?.scrollTo(...args),
+    [gridRef]
+  );
+
+  const scrollToItem = useCallback<VariableSizeGrid['scrollToItem']>(
+    (...args) => gridRef.current?.scrollToItem(...args),
+    [gridRef]
+  );
+
   // Set the ref APIs
   useImperativeHandle(
     ref,
-    () => ({
+    (): EuiDataGridRefProps => ({
       setIsFullScreen,
       setFocusedCell,
       openCellPopover,
       closeCellPopover,
+      scrollTo,
+      scrollToItem,
     }),
-    [setIsFullScreen, setFocusedCell, openCellPopover, closeCellPopover]
+    [
+      setIsFullScreen,
+      setFocusedCell,
+      openCellPopover,
+      closeCellPopover,
+      scrollTo,
+      scrollToItem,
+    ]
   );
 };
 
@@ -135,7 +157,7 @@ export const useSortPageCheck = (
         : rowIndex;
 
       // Account for pagination
-      if (pagination) {
+      if (pagination && pagination.pageSize > 0) {
         const pageIndex = Math.floor(visibleRowIndex / pagination.pageSize);
         // If the targeted row is on a different page than the current page,
         // we should automatically navigate the user to the correct page

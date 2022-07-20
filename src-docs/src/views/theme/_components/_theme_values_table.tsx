@@ -1,4 +1,3 @@
-import { css } from '@emotion/react';
 import React, { ReactNode } from 'react';
 import {
   EuiSpacer,
@@ -11,13 +10,14 @@ import {
 } from '../../../../../src';
 import { getType } from '../_props';
 
-import { getDescriptionSmall } from './_theme_values_descriptions';
+import { getDescriptionSmall } from '../../../services/props/get_description';
 
 interface BasicItem {
   id: string;
   token: string;
   type?: any;
   value?: any;
+  styleFn?: (...args: any[]) => any;
   /**
    * Requires a Markdown style string
    */
@@ -133,13 +133,5 @@ export const ThemeValuesTable = ({
     });
   }
 
-  return (
-    <EuiBasicTable
-      css={css`
-        margin-bottom: ${euiTheme.size.xxxl};
-      `}
-      items={items}
-      columns={columns}
-    />
-  );
+  return <EuiBasicTable items={items} columns={columns} />;
 };

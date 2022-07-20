@@ -11,7 +11,6 @@ import { shallow } from 'enzyme';
 import createCache from '@emotion/cache';
 
 import { EuiProvider } from './provider';
-import { EuiThemeLegacy } from '../../themes/legacy/theme';
 
 describe('EuiProvider', () => {
   it('is rendered', () => {
@@ -29,19 +28,47 @@ describe('EuiProvider', () => {
   });
 
   describe('providing an @emotion cache config', () => {
-    const emotionCache = createCache({
-      key: 'testing',
+    const defaultCache = createCache({
+      key: 'default',
     });
-    it('applies the cache to global styles', () => {
-      const component = shallow(<EuiProvider cache={emotionCache} />);
+    const globalCache = createCache({
+      key: 'global',
+    });
+    const utilityCache = createCache({
+      key: 'utility',
+    });
+    it('applies the cache to all styles', () => {
+      const component = shallow(<EuiProvider cache={defaultCache} />);
 
       expect(component).toMatchSnapshot();
     });
-  });
 
-  describe('changing themes', () => {
-    it('propagates `theme`', () => {
-      const component = shallow(<EuiProvider theme={EuiThemeLegacy} />);
+    it('applies the cache to global styles', () => {
+      const component = shallow(
+        <EuiProvider cache={{ global: globalCache }} />
+      );
+
+      expect(component).toMatchSnapshot();
+    });
+
+    it('applies the cache to utility styles', () => {
+      const component = shallow(
+        <EuiProvider cache={{ utility: utilityCache }} />
+      );
+
+      expect(component).toMatchSnapshot();
+    });
+
+    it('applies the cache to each location separately', () => {
+      const component = shallow(
+        <EuiProvider
+          cache={{
+            default: defaultCache,
+            global: globalCache,
+            utility: utilityCache,
+          }}
+        />
+      );
 
       expect(component).toMatchSnapshot();
     });

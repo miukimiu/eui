@@ -1,7 +1,6 @@
 // Import base theme first, then override
 @import '../../../../global_styling/mixins/responsive';
 @import '../../../../global_styling/mixins/shadow';
-@import 'shadow';
 @import '../../../../global_styling/mixins/size';
 @import '../../../../global_styling/mixins/typography';
 @import 'typography';
@@ -18,7 +17,6 @@
 @import '../../../../global_styling/mixins/loading';
 @import 'link';
 @import '../../../../global_styling/mixins/panel';
-@import 'panel';
 @import '../../../../global_styling/mixins/popover';
 @import 'popover';
 @import 'range';

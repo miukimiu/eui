@@ -13,14 +13,14 @@ Array [
       class="euiFormControlLayout__childrenWrapper"
     >
       <span
-        class="euiScreenReaderOnly"
+        class="emotion-euiScreenReaderOnly"
       >
         Select an option: , is selected
       </span>
       <button
         aria-haspopup="listbox"
         aria-label="aria-label"
-        class="euiSuperSelectControl testClass1 testClass2"
+        class="euiSuperSelectControl euiFormControlLayout--1icons testClass1 testClass2"
         data-test-subj="test subject string"
         type="button"
       />
@@ -55,13 +55,13 @@ Array [
       class="euiFormControlLayout__childrenWrapper"
     >
       <span
-        class="euiScreenReaderOnly"
+        class="emotion-euiScreenReaderOnly"
       >
         Select an option: , is selected
       </span>
       <button
         aria-haspopup="listbox"
-        class="euiSuperSelectControl euiSuperSelectControl--compressed"
+        class="euiSuperSelectControl euiFormControlLayout--1icons euiSuperSelectControl--compressed"
         type="button"
       />
       <div
@@ -95,13 +95,13 @@ Array [
       class="euiFormControlLayout__childrenWrapper"
     >
       <span
-        class="euiScreenReaderOnly"
+        class="emotion-euiScreenReaderOnly"
       >
         Select an option: , is selected
       </span>
       <button
         aria-haspopup="listbox"
-        class="euiSuperSelectControl"
+        class="euiSuperSelectControl euiFormControlLayout--1icons"
         type="button"
       />
       <div
@@ -135,13 +135,13 @@ Array [
       class="euiFormControlLayout__childrenWrapper"
     >
       <span
-        class="euiScreenReaderOnly"
+        class="emotion-euiScreenReaderOnly"
       >
         Select an option: , is selected
       </span>
       <button
         aria-haspopup="listbox"
-        class="euiSuperSelectControl"
+        class="euiSuperSelectControl euiFormControlLayout--1icons"
         type="button"
       />
       <div
@@ -175,13 +175,13 @@ Array [
       class="euiFormControlLayout__childrenWrapper"
     >
       <span
-        class="euiScreenReaderOnly"
+        class="emotion-euiScreenReaderOnly"
       >
         Select an option: , is selected
       </span>
       <button
         aria-haspopup="listbox"
-        class="euiSuperSelectControl euiSuperSelectControl--fullWidth"
+        class="euiSuperSelectControl euiFormControlLayout--1icons euiSuperSelectControl--fullWidth"
         type="button"
       />
       <div
@@ -215,18 +215,22 @@ Array [
       class="euiFormControlLayout__childrenWrapper"
     >
       <span
-        class="euiScreenReaderOnly"
+        class="emotion-euiScreenReaderOnly"
       >
         Select an option: , is selected
       </span>
       <button
         aria-haspopup="listbox"
-        class="euiSuperSelectControl euiSuperSelectControl-isInvalid"
+        class="euiSuperSelectControl euiFormControlLayout--2icons euiSuperSelectControl-isInvalid"
         type="button"
       />
       <div
         class="euiFormControlLayoutIcons euiFormControlLayoutIcons--right"
       >
+        <span
+          color="danger"
+          data-euiicon-type="alert"
+        />
         <span
           class="euiFormControlLayoutCustomIcon"
         >
@@ -255,20 +259,22 @@ Array [
       class="euiFormControlLayout__childrenWrapper"
     >
       <span
-        class="euiScreenReaderOnly"
+        class="emotion-euiScreenReaderOnly"
       >
         Select an option: , is selected
       </span>
       <button
         aria-haspopup="listbox"
-        class="euiSuperSelectControl euiSuperSelectControl-isLoading"
+        class="euiSuperSelectControl euiFormControlLayout--2icons euiSuperSelectControl-isLoading"
         type="button"
       />
       <div
         class="euiFormControlLayoutIcons euiFormControlLayoutIcons--right"
       >
         <span
-          class="euiLoadingSpinner euiLoadingSpinner--medium"
+          aria-label="Loading"
+          class="euiLoadingSpinner emotion-euiLoadingSpinner-m"
+          role="progressbar"
         />
         <span
           class="euiFormControlLayoutCustomIcon"
@@ -298,13 +304,13 @@ Array [
       class="euiFormControlLayout__childrenWrapper"
     >
       <span
-        class="euiScreenReaderOnly"
+        class="emotion-euiScreenReaderOnly"
       >
         Select an option: Option #1, is selected
       </span>
       <button
         aria-haspopup="listbox"
-        class="euiSuperSelectControl"
+        class="euiSuperSelectControl euiFormControlLayout--1icons"
         type="button"
       >
         Option #1

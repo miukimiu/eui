@@ -10,8 +10,6 @@
  * Elements within EuiComboBox which would normally be tabbable (inputs, buttons) have been removed
  * from the tab order with tabindex={-1} so that we can control the keyboard navigation interface.
  */
-/* eslint-disable jsx-a11y/role-has-required-aria-props */
-
 import React, {
   Component,
   FocusEventHandler,
@@ -23,6 +21,7 @@ import classNames from 'classnames';
 
 import { findPopoverPosition, htmlIdGenerator, keys } from '../../services';
 import { EuiPortal } from '../portal';
+import { EuiI18n } from '../i18n';
 import { EuiComboBoxOptionsList } from './combo_box_options_list';
 
 import {
@@ -551,7 +550,7 @@ export class EuiComboBox<T> extends Component<
   };
 
   onContainerBlur: EventListener = (event) => {
-    // close the options list, unless the use clicked on an option
+    // close the options list, unless the user clicked on an option
 
     /**
      * FireFox returns `relatedTarget` as `null` for security reasons, but provides a proprietary `explicitOriginalTarget`.
@@ -587,6 +586,15 @@ export class EuiComboBox<T> extends Component<
       if (!this.hasActiveOption()) {
         this.setCustomOptions(true);
       }
+    } else if (focusedInOptionsList) {
+      // https://github.com/elastic/eui/issues/5179
+      // need to restore focus to the input box when clicking non-interactive elements
+
+      // firefox doesn't support calling .focus() during a blur event
+      // https://bugzilla.mozilla.org/show_bug.cgi?id=53579
+      requestAnimationFrame(() => {
+        this.searchInputRefInstance?.focus();
+      });
     }
   };
 
@@ -981,61 +989,64 @@ export class EuiComboBox<T> extends Component<
 
       optionsList = (
         <EuiPortal>
-          <EuiComboBoxOptionsList
-            zIndex={this.state.listZIndex}
-            activeOptionIndex={this.state.activeOptionIndex}
-            areAllOptionsSelected={this.areAllOptionsSelected()}
-            customOptionText={customOptionText}
-            data-test-subj={optionsListDataTestSubj}
-            fullWidth={fullWidth}
-            isLoading={isLoading}
-            listRef={this.listRefCallback}
-            matchingOptions={matchingOptions}
-            onCloseList={this.closeList}
-            onCreateOption={onCreateOption}
-            onOptionClick={this.onOptionClick}
-            onOptionEnterKey={this.onOptionEnterKey}
-            onScroll={this.onOptionListScroll}
-            optionRef={this.optionRefCallback}
-            options={options}
-            position={listPosition}
-            singleSelection={singleSelection}
-            renderOption={renderOption}
-            rootId={this.rootId}
-            rowHeight={rowHeight}
-            scrollToIndex={activeOptionIndex}
-            searchValue={searchValue}
-            selectedOptions={selectedOptions}
-            updatePosition={this.updatePosition}
-            width={width}
-            delimiter={delimiter}
-            getSelectedOptionForSearchValue={getSelectedOptionForSearchValue}
-          />
+          <EuiI18n
+            token="euiComboBox.listboxAriaLabel"
+            default="Choose from the following options"
+          >
+            {(listboxAriaLabel: string) => (
+              <EuiComboBoxOptionsList
+                zIndex={this.state.listZIndex}
+                activeOptionIndex={this.state.activeOptionIndex}
+                areAllOptionsSelected={this.areAllOptionsSelected()}
+                customOptionText={customOptionText}
+                data-test-subj={optionsListDataTestSubj}
+                fullWidth={fullWidth}
+                isLoading={isLoading}
+                listRef={this.listRefCallback}
+                matchingOptions={matchingOptions}
+                onCloseList={this.closeList}
+                onCreateOption={onCreateOption}
+                onOptionClick={this.onOptionClick}
+                onOptionEnterKey={this.onOptionEnterKey}
+                onScroll={this.onOptionListScroll}
+                optionRef={this.optionRefCallback}
+                options={options}
+                position={listPosition}
+                singleSelection={singleSelection}
+                renderOption={renderOption}
+                rootId={this.rootId}
+                rowHeight={rowHeight}
+                scrollToIndex={activeOptionIndex}
+                searchValue={searchValue}
+                selectedOptions={selectedOptions}
+                updatePosition={this.updatePosition}
+                width={width}
+                delimiter={delimiter}
+                getSelectedOptionForSearchValue={
+                  getSelectedOptionForSearchValue
+                }
+                listboxAriaLabel={listboxAriaLabel}
+              />
+            )}
+          </EuiI18n>
         </EuiPortal>
       );
     }
 
     return (
       /**
-       * Re: jsx-a11y/interactive-supports-focus
-       * Focus is managed and is placed on the textbox element (`EuiComboBoxInput`)
+       * EuiComboBox follows the WAI-ARIA 1.2 spec for editable comboboxes
+       * with list autocomplete. This pattern is an improvement on the user
+       * experience for screen readers over the WAI-ARIA 1.1 pattern.
        *
-       * Re: jsx-a11y/role-has-required-aria-props
-       * Expansion is managed and required `aria-controls` prop is placed on the textbox element (`EuiComboBoxInput`)
-       *
-       * Reference for both: https://www.w3.org/TR/2017/REC-wai-aria-1.1-20171214/#combobox,
-       * which verifies that this implementation follows the spec.
+       * https://www.w3.org/TR/wai-aria-practices-1.2/examples/combobox/combobox-autocomplete-list.html
        */
-      // eslint-disable-next-line jsx-a11y/interactive-supports-focus
       <div
         {...rest}
-        aria-expanded={isListOpen}
-        aria-haspopup="listbox"
         className={classes}
         data-test-subj={dataTestSubj}
         onKeyDown={this.onKeyDown}
         ref={this.comboBoxRefCallback}
-        role="combobox"
       >
         <EuiComboBoxInput
           autoSizeInputRef={this.autoSizeInputRefCallback}

@@ -7,7 +7,7 @@
  */
 
 import React from 'react';
-import { mount, shallow } from 'enzyme';
+import { mount, shallow, render } from 'enzyme';
 import { requiredProps } from '../../test';
 
 import { EuiInMemoryTable, EuiInMemoryTableProps } from './in_memory_table';
@@ -224,6 +224,31 @@ describe('EuiInMemoryTable', () => {
     expect(component).toMatchSnapshot();
   });
 
+  test('with pagination and "show all" page size', () => {
+    const props: EuiInMemoryTableProps<BasicItem> = {
+      ...requiredProps,
+      items: [
+        { id: '1', name: 'name1' },
+        { id: '2', name: 'name2' },
+        { id: '3', name: 'name3' },
+      ],
+      columns: [
+        {
+          field: 'name',
+          name: 'Name',
+          description: 'description',
+        },
+      ],
+      pagination: {
+        initialPageSize: 0,
+        pageSizeOptions: [1, 2, 3, 0],
+      },
+    };
+    const component = render(<EuiInMemoryTable {...props} />);
+
+    expect(component).toMatchSnapshot();
+  });
+
   test('with pagination, default page size and error', () => {
     const props: EuiInMemoryTableProps<BasicItem> = {
       ...requiredProps,
@@ -262,7 +287,7 @@ describe('EuiInMemoryTable', () => {
         },
       ],
       pagination: {
-        hidePerPageOptions: true,
+        showPerPageOptions: false,
       },
     };
     const component = shallow(<EuiInMemoryTable {...props} />);
@@ -485,7 +510,7 @@ describe('EuiInMemoryTable', () => {
         initialSelected: [{ id: '1', name: 'name1' }],
       },
     };
-    const component = mount(<EuiInMemoryTable {...props} />);
+    const component = shallow(<EuiInMemoryTable {...props} />);
 
     expect(component).toMatchSnapshot();
   });
@@ -960,7 +985,7 @@ describe('EuiInMemoryTable', () => {
       // this is specifically testing regression against https://github.com/elastic/eui/issues/1007
       component.setProps({});
 
-      expect(component).toMatchSnapshot();
+      expect(component.render()).toMatchSnapshot();
     });
 
     test('pagination with actions column and sorting set to true', async () => {

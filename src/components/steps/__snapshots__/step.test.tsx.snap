@@ -13,7 +13,7 @@ exports[`EuiStep is rendered 1`] = `
       class="euiStepNumber euiStep__circle"
     >
       <span
-        class="euiScreenReaderOnly"
+        class="emotion-euiScreenReaderOnly"
       >
         Step 1
       </span>
@@ -25,7 +25,7 @@ exports[`EuiStep is rendered 1`] = `
       </span>
     </span>
     <p
-      class="euiTitle euiTitle--small euiStep__title"
+      class="euiTitle euiStep__title emotion-euiTitle-s"
     >
       First step
     </p>
@@ -51,7 +51,7 @@ exports[`EuiStep props headingElement 1`] = `
       class="euiStepNumber euiStep__circle"
     >
       <span
-        class="euiScreenReaderOnly"
+        class="emotion-euiScreenReaderOnly"
       >
         Step 1
       </span>
@@ -63,7 +63,7 @@ exports[`EuiStep props headingElement 1`] = `
       </span>
     </span>
     <h3
-      class="euiTitle euiTitle--small euiStep__title"
+      class="euiTitle euiStep__title emotion-euiTitle-s"
     >
       First step
     </h3>
@@ -89,13 +89,14 @@ exports[`EuiStep props status complete is rendered 1`] = `
       class="euiStepNumber euiStepNumber--complete euiStep__circle"
     >
       <span
-        aria-label="Step 1 is complete"
         class="euiStepNumber__icon"
         data-euiicon-type="check"
-      />
+      >
+        Step 1 is complete
+      </span>
     </span>
     <p
-      class="euiTitle euiTitle--small euiStep__title"
+      class="euiTitle euiStep__title emotion-euiTitle-s"
     >
       First step
     </p>
@@ -121,7 +122,7 @@ exports[`EuiStep props status current is rendered 1`] = `
       class="euiStepNumber euiStep__circle"
     >
       <span
-        class="euiScreenReaderOnly"
+        class="emotion-euiScreenReaderOnly"
       >
         Current step is 1
       </span>
@@ -133,7 +134,7 @@ exports[`EuiStep props status current is rendered 1`] = `
       </span>
     </span>
     <p
-      class="euiTitle euiTitle--small euiStep__title"
+      class="euiTitle euiStep__title emotion-euiTitle-s"
     >
       First step
     </p>
@@ -159,13 +160,14 @@ exports[`EuiStep props status danger is rendered 1`] = `
       class="euiStepNumber euiStepNumber--danger euiStep__circle"
     >
       <span
-        aria-label="Step 1 has errors"
         class="euiStepNumber__icon"
         data-euiicon-type="cross"
-      />
+      >
+        Step 1 has errors
+      </span>
     </span>
     <p
-      class="euiTitle euiTitle--small euiStep__title"
+      class="euiTitle euiStep__title emotion-euiTitle-s"
     >
       First step
     </p>
@@ -191,7 +193,7 @@ exports[`EuiStep props status disabled is rendered 1`] = `
       class="euiStepNumber euiStepNumber--disabled euiStep__circle"
     >
       <span
-        class="euiScreenReaderOnly"
+        class="emotion-euiScreenReaderOnly"
       >
         Step 1 is disabled
       </span>
@@ -203,7 +205,7 @@ exports[`EuiStep props status disabled is rendered 1`] = `
       </span>
     </span>
     <p
-      class="euiTitle euiTitle--small euiStep__title"
+      class="euiTitle euiStep__title emotion-euiTitle-s"
     >
       First step
     </p>
@@ -226,10 +228,10 @@ exports[`EuiStep props status incomplete is rendered 1`] = `
     class="euiStep__titleWrapper"
   >
     <span
-      class="euiStepNumber euiStepNumber--incomplete euiStepNumber-isHollow euiStep__circle"
+      class="euiStepNumber euiStepNumber--incomplete euiStep__circle"
     >
       <span
-        class="euiScreenReaderOnly"
+        class="emotion-euiScreenReaderOnly"
       >
         Step 1 is incomplete
       </span>
@@ -241,7 +243,7 @@ exports[`EuiStep props status incomplete is rendered 1`] = `
       </span>
     </span>
     <p
-      class="euiTitle euiTitle--small euiStep__title"
+      class="euiTitle euiStep__title emotion-euiTitle-s"
     >
       First step
     </p>
@@ -267,16 +269,18 @@ exports[`EuiStep props status loading is rendered 1`] = `
       class="euiStepNumber euiStepNumber--loading euiStep__circle"
     >
       <span
-        class="euiScreenReaderOnly"
+        class="emotion-euiScreenReaderOnly"
       >
         Step 1 is loading
       </span>
       <span
-        class="euiLoadingSpinner euiLoadingSpinner--xLarge euiStepNumber__loader"
+        aria-label="Loading"
+        class="euiLoadingSpinner euiStepNumber__loader emotion-euiLoadingSpinner-xl"
+        role="progressbar"
       />
     </span>
     <p
-      class="euiTitle euiTitle--small euiStep__title"
+      class="euiTitle euiStep__title emotion-euiTitle-s"
     >
       First step
     </p>
@@ -302,13 +306,14 @@ exports[`EuiStep props status warning is rendered 1`] = `
       class="euiStepNumber euiStepNumber--warning euiStep__circle"
     >
       <span
-        aria-label="Step 1 has warnings"
         class="euiStepNumber__icon"
         data-euiicon-type="alert"
-      />
+      >
+        Step 1 has warnings
+      </span>
     </span>
     <p
-      class="euiTitle euiTitle--small euiStep__title"
+      class="euiTitle euiStep__title emotion-euiTitle-s"
     >
       First step
     </p>
@@ -334,7 +339,7 @@ exports[`EuiStep props step 1`] = `
       class="euiStepNumber euiStep__circle"
     >
       <span
-        class="euiScreenReaderOnly"
+        class="emotion-euiScreenReaderOnly"
       >
         Step 5
       </span>
@@ -346,7 +351,7 @@ exports[`EuiStep props step 1`] = `
       </span>
     </span>
     <p
-      class="euiTitle euiTitle--small euiStep__title"
+      class="euiTitle euiStep__title emotion-euiTitle-s"
     >
       First step
     </p>
@@ -372,7 +377,7 @@ exports[`EuiStep props titleSize 1`] = `
       class="euiStepNumber euiStep__circle euiStepNumber--small"
     >
       <span
-        class="euiScreenReaderOnly"
+        class="emotion-euiScreenReaderOnly"
       >
         Step 1
       </span>
@@ -384,7 +389,7 @@ exports[`EuiStep props titleSize 1`] = `
       </span>
     </span>
     <p
-      class="euiTitle euiTitle--xsmall euiStep__title"
+      class="euiTitle euiStep__title emotion-euiTitle-xs"
     >
       First step
     </p>

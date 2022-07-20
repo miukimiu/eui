@@ -2,6 +2,7 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CircularDependencyPlugin = require('circular-dependency-plugin');
 const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 const babelConfig = require('./.babelrc.js');
 
 const getPort = require('get-port');
@@ -81,7 +82,10 @@ const webpackConfig = {
         loaders: employCache([
           {
             loader: 'style-loader',
-            options: { injectType: 'lazySingletonStyleTag' },
+            options: {
+              injectType: 'lazySingletonStyleTag',
+              insert: 'meta[name="sass-styles-compiled"]',
+            },
           },
           'css-loader',
           'postcss-loader',
@@ -149,6 +153,22 @@ const webpackConfig = {
   node: {
     fs: 'empty',
   },
+
+  optimization: {
+    minimize: isProduction,
+    minimizer: [
+      new TerserPlugin({
+        parallel: true,
+        terserOptions: {
+          // prevent Eui* function (component) names from being mangled,
+          // as mangling prevents copy-pasteable component code from being generated
+          keep_fnames: /^Eui[A-Z]/,
+        },
+      }),
+    ],
+  },
+
+  stats: 'minimal',
 };
 
 // Inspired by `get-port-sync`, but propogates options

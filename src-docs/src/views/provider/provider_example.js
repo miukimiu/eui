@@ -17,7 +17,6 @@ import GlobalStyles from './provider_styles';
 
 export const ProviderExample = {
   title: 'Provider',
-  isNew: true,
   intro: (
     <EuiText>
       <p>
@@ -88,19 +87,32 @@ export const ProviderExample = {
             <EuiCode>@emotion/cache</EuiCode> and style injection location
           </h3>
           <p>
-            In the case that your app has its own static stylesheet, the global
-            styles may not be injected into the correct location in the{' '}
-            <EuiCode>{'<head>'}</EuiCode>, causing unintentional overrides or
-            unapplied styles.{' '}
+            In the case that your app has its own static stylesheet,{' '}
+            <EuiCode>@emotion</EuiCode> styles may not be injected into the
+            correct location in the <EuiCode>{'<head>'}</EuiCode>, causing
+            unintentional overrides or unapplied styles.{' '}
             <EuiLink href="https://emotion.sh/docs/@emotion/cache" external>
               The <strong>@emotion/cache</strong> library
             </EuiLink>{' '}
             provides configuration options that help with specifying the
-            injection location. We recommend using a{' '}
-            <EuiCode>{'<meta>'}</EuiCode> tag to achieve this.
+            injection location. We recommend using <EuiCode>{'<meta>'}</EuiCode>{' '}
+            tags to achieve this.
           </p>
 
           <GlobalStyles />
+
+          <p>
+            For most applications, the above configuration will be enough to
+            have styles ordered correctly. In advanced more cases, you may use
+            the <EuiCode>default</EuiCode>,<EuiCode>global</EuiCode>, and{' '}
+            <EuiCode>utility</EuiCode> properties on the{' '}
+            <EuiCode>cache</EuiCode> prop to further define where specific
+            styles should be inserted. See{' '}
+            <EuiLink href="#/utilities/provider#euiprovider-props">
+              the props documentation
+            </EuiLink>{' '}
+            for details.
+          </p>
 
           <p>
             Any other options available with{' '}

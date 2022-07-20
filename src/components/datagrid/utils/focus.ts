@@ -19,7 +19,7 @@ import {
   MutableRefObject,
 } from 'react';
 import { GridOnItemsRenderedProps } from 'react-window';
-import tabbable from 'tabbable';
+import { tabbable } from 'tabbable';
 import { keys } from '../../../services';
 import {
   DataGridFocusContextShape,
@@ -35,7 +35,7 @@ export const DataGridFocusContext = createContext<DataGridFocusContextShape>({
   focusFirstVisibleInteractiveCell: () => {},
 });
 
-type FocusProps = Pick<HTMLAttributes<HTMLDivElement>, 'tabIndex' | 'onFocus'>;
+type FocusProps = Pick<HTMLAttributes<HTMLDivElement>, 'tabIndex' | 'onKeyUp'>;
 
 /**
  * Main focus context and overarching focus state management
@@ -67,10 +67,22 @@ export const useFocus = ({
     EuiDataGridFocusedCell | undefined
   >(undefined);
 
-  const setFocusedCell = useCallback((focusedCell: EuiDataGridFocusedCell) => {
-    _setFocusedCell(focusedCell);
-    setIsFocusedCellInView(true); // scrolling.ts ensures focused cells are fully in view
-  }, []);
+  const setFocusedCell = useCallback(
+    (nextFocusedCell: EuiDataGridFocusedCell) => {
+      // If the x/y coordinates remained the same, don't update. This keeps the focusedCell
+      // reference stable, and allows it to be used in places that need reference equality.
+      if (
+        nextFocusedCell[0] === focusedCell?.[0] &&
+        nextFocusedCell[1] === focusedCell?.[1]
+      ) {
+        return;
+      }
+
+      _setFocusedCell(nextFocusedCell);
+      setIsFocusedCellInView(true); // scrolling.ts ensures focused cells are fully in view
+    },
+    [focusedCell]
+  );
 
   const previousCell = useRef<EuiDataGridFocusedCell | undefined>(undefined);
   useEffect(() => {
@@ -114,13 +126,16 @@ export const useFocus = ({
           }
         : {
             tabIndex: 0,
-            onFocus: (e) => {
-              // if e.target (the source element of the `focus event`
-              // matches e.currentTarget (always the div with this onFocus listener)
-              // then the user has focused directly on the data grid wrapper (almost definitely by tabbing)
-              // so shift focus to the first visible and interactive cell within the grid
-              if (e.target === e.currentTarget) {
-                focusFirstVisibleInteractiveCell();
+            onKeyUp: (e: KeyboardEvent) => {
+              // Ensure we only manually focus into the grid via keyboard tab -
+              // mouse users can accidentally trigger focus by clicking on scrollbars
+              if (e.key === keys.TAB) {
+                // if e.target (the source element of the `focus event`) matches
+                // e.currentTarget (always the div with this onKeyUp listener)
+                // then the user has focused directly on the data grid wrapper
+                if (e.target === e.currentTarget) {
+                  focusFirstVisibleInteractiveCell();
+                }
               }
             },
           },
@@ -215,7 +230,7 @@ export const createKeyDownHandler = ({
         setFocusedCell([x + 1, y]);
       }
     } else if (key === keys.PAGE_DOWN) {
-      if (pagination) {
+      if (pagination && pagination.pageSize > 0) {
         event.preventDefault();
         const pageSize = pagination.pageSize;
         const pageCount = Math.ceil(rowCount / pageSize);
@@ -226,7 +241,7 @@ export const createKeyDownHandler = ({
         setFocusedCell([focusedCell[0], 0]);
       }
     } else if (key === keys.PAGE_UP) {
-      if (pagination) {
+      if (pagination && pagination.pageSize > 0) {
         event.preventDefault();
         const pageIndex = pagination.pageIndex;
         if (pageIndex > 0) {
@@ -272,10 +287,7 @@ export const preventTabbing = (records: MutationRecord[]) => {
       const tabbables = tabbable(cell);
       for (let i = 0; i < tabbables.length; i++) {
         const element = tabbables[i];
-        if (
-          element.getAttribute('role') !== 'gridcell' &&
-          !element.dataset['euigrid-tab-managed']
-        ) {
+        if (!element.hasAttribute('data-euigrid-tab-managed')) {
           element.setAttribute('tabIndex', '-1');
           element.setAttribute('data-datagrid-interactable', 'true');
         }

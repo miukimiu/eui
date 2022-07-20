@@ -6,10 +6,38 @@
  * Side Public License, v 1.
  */
 
-import { RowHeightUtils, cellPaddingsMap } from './row_heights';
+import type { MutableRefObject } from 'react';
+import { act } from 'react-dom/test-utils';
+import { testCustomHook } from '../../../test/internal';
+import { startingStyles } from '../controls';
+import type { ImperativeGridApi } from '../data_grid_types';
+import {
+  cellPaddingsMap,
+  RowHeightUtils,
+  useRowHeightUtils,
+} from './row_heights';
 
 describe('RowHeightUtils', () => {
-  const rowHeightUtils = new RowHeightUtils();
+  const gridRef: MutableRefObject<ImperativeGridApi | null> = {
+    current: {
+      resetAfterIndices: jest.fn(),
+      resetAfterColumnIndex: jest.fn(),
+      resetAfterRowIndex: jest.fn(),
+      scrollTo: jest.fn(),
+      scrollToItem: jest.fn(),
+    },
+  };
+  const rerenderGridBodyRef = { current: jest.fn() };
+  const rowHeightUtils = new RowHeightUtils(gridRef, rerenderGridBodyRef);
+
+  beforeEach(() => {
+    jest.useFakeTimers();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+    jest.resetAllMocks();
+  });
 
   describe('getRowHeightOption', () => {
     const rowHeightsOptions = {
@@ -109,8 +137,15 @@ describe('RowHeightUtils', () => {
     });
 
     describe('auto height', () => {
-      const getRowHeightSpy = jest.spyOn(rowHeightUtils, 'getRowHeight');
-      beforeEach(() => getRowHeightSpy.mockClear());
+      let getRowHeightSpy: jest.SpyInstance;
+
+      beforeEach(() => {
+        getRowHeightSpy = jest.spyOn(rowHeightUtils, 'getRowHeight');
+      });
+
+      afterEach(() => {
+        getRowHeightSpy.mockRestore();
+      });
 
       it('gets the max height for the current row from the heights cache', () => {
         expect(rowHeightUtils.getCalculatedHeight('auto', 34, 1)).toEqual(0); // 0 is expected since the cache is empty
@@ -145,6 +180,16 @@ describe('RowHeightUtils', () => {
             paddingTop: padding,
             paddingBottom: padding,
           });
+        });
+      });
+
+      it('falls back to m-sized cellPadding if gridStyle.cellPadding is undefined', () => {
+        rowHeightUtils.cacheStyles({ cellPadding: undefined });
+
+        // @ts-ignore this var is private, but we're inspecting it for the sake of the unit test
+        expect(rowHeightUtils.styles).toEqual({
+          paddingTop: 6,
+          paddingBottom: 6,
         });
       });
     });
@@ -194,13 +239,19 @@ describe('RowHeightUtils', () => {
     });
 
     describe('calculateHeightForLineCount', () => {
+      let getComputedStyleSpy: jest.SpyInstance;
+      const cell = document.createElement('div');
+
       beforeEach(() => {
         rowHeightUtils.cacheStyles({ cellPadding: 'm' });
-        jest
+        getComputedStyleSpy = jest
           .spyOn(window, 'getComputedStyle')
           .mockReturnValue({ lineHeight: '24px' } as CSSStyleDeclaration);
       });
-      const cell = document.createElement('div');
+
+      afterEach(() => {
+        getComputedStyleSpy.mockRestore();
+      });
 
       it('calculates the row height based on the number of lines and cell line height/padding', () => {
         expect(rowHeightUtils.calculateHeightForLineCount(cell, 1)).toEqual(36); // 1 * 24 + 6 + 6
@@ -257,10 +308,17 @@ describe('RowHeightUtils', () => {
     });
 
     describe('row height cache', () => {
-      describe('setRowHeight', () => {
-        const resetRowSpy = jest.spyOn(rowHeightUtils, 'resetRow');
-        beforeEach(() => resetRowSpy.mockClear());
+      let resetRowSpy: jest.SpyInstance;
 
+      beforeEach(() => {
+        resetRowSpy = jest.spyOn(rowHeightUtils, 'resetRow');
+      });
+
+      afterEach(() => {
+        resetRowSpy.mockRestore();
+      });
+
+      describe('setRowHeight', () => {
         it('setRowHeight', () => {
           rowHeightUtils.setRowHeight(5, 'a', 50, 0);
           rowHeightUtils.setRowHeight(5, 'b', 34, 0);
@@ -284,11 +342,9 @@ describe('RowHeightUtils', () => {
         });
 
         it('calls rerenderGridBody', () => {
-          const rerenderGridBody = jest.fn();
-          rowHeightUtils.setRerenderGridBody(rerenderGridBody);
-          expect(rerenderGridBody).toHaveBeenCalledTimes(0);
+          expect(rerenderGridBodyRef.current).toHaveBeenCalledTimes(0);
           rowHeightUtils.setRowHeight(1, 'a', 34, 1);
-          expect(rerenderGridBody).toHaveBeenCalledTimes(1);
+          expect(rerenderGridBodyRef.current).toHaveBeenCalledTimes(1);
         });
       });
 
@@ -303,9 +359,6 @@ describe('RowHeightUtils', () => {
       });
 
       describe('pruneHiddenColumnHeights', () => {
-        const resetRowSpy = jest.spyOn(rowHeightUtils, 'resetRow');
-        beforeEach(() => resetRowSpy.mockClear());
-
         it('checks each row height map and deletes column IDs that are no longer visible', () => {
           rowHeightUtils.pruneHiddenColumnHeights([{ id: 'a' }, { id: 'b' }]);
           expect(rowHeightUtils.getRowHeight(5)).toEqual(62);
@@ -325,21 +378,16 @@ describe('RowHeightUtils', () => {
     });
 
     describe('grid resetting', () => {
-      const mockGrid = { resetAfterRowIndex: jest.fn() } as any;
-      beforeEach(() => jest.clearAllMocks());
-
-      describe('setGrid', () => {
-        it('stores the react-window grid as an instance variable', () => {
-          rowHeightUtils.setGrid(mockGrid);
-
-          // @ts-ignore this var is private, but we're inspecting it for the sake of the unit test
-          expect(rowHeightUtils.grid).toEqual(mockGrid);
-        });
-      });
-
       describe('resetRow', () => {
-        const resetGridSpy = jest.spyOn(rowHeightUtils, 'resetGrid');
-        jest.useFakeTimers();
+        let resetGridSpy: jest.SpyInstance;
+
+        beforeEach(() => {
+          resetGridSpy = jest.spyOn(rowHeightUtils, 'resetGrid');
+        });
+
+        afterEach(() => {
+          resetGridSpy.mockRestore();
+        });
 
         it('sets this.lastUpdatedRow and resets the grid', () => {
           rowHeightUtils.resetRow(0);
@@ -347,6 +395,7 @@ describe('RowHeightUtils', () => {
           expect(rowHeightUtils.lastUpdatedRow).toEqual(0);
 
           jest.runAllTimers();
+
           expect(resetGridSpy).toHaveBeenCalled();
           // @ts-ignore this var is private, but we're inspecting it for the sake of the unit test
           expect(rowHeightUtils.lastUpdatedRow).toEqual(Infinity);
@@ -356,18 +405,124 @@ describe('RowHeightUtils', () => {
       describe('resetGrid', () => {
         it('invokes grid.resetAfterRowIndex with the last visible row', () => {
           rowHeightUtils.setRowHeight(99, 'a', 34, 99);
-          rowHeightUtils.resetGrid();
-          expect(mockGrid.resetAfterRowIndex).toHaveBeenCalledWith(99);
+
+          jest.runAllTimers();
+
+          expect(gridRef.current?.resetAfterRowIndex).toHaveBeenCalledWith(99);
         });
 
         it('invokes resetAfterRowIndex only once with the smallest cached row index', () => {
-          rowHeightUtils.setRowHeight(97, 'a', 34, 97);
-          rowHeightUtils.setRowHeight(99, 'a', 34, 99);
-          rowHeightUtils.resetGrid();
-          expect(mockGrid.resetAfterRowIndex).toHaveBeenCalledTimes(1);
-          expect(mockGrid.resetAfterRowIndex).toHaveBeenCalledWith(97);
+          rowHeightUtils.setRowHeight(97, 'a', 35, 97);
+          rowHeightUtils.setRowHeight(99, 'a', 36, 99);
+
+          jest.runAllTimers();
+
+          expect(gridRef.current?.resetAfterRowIndex).toHaveBeenCalledTimes(1);
+          expect(gridRef.current?.resetAfterRowIndex).toHaveBeenCalledWith(97);
         });
       });
     });
+  });
+});
+
+describe('useRowHeightUtils', () => {
+  const gridRef: MutableRefObject<ImperativeGridApi | null> = {
+    current: {
+      resetAfterIndices: jest.fn(),
+      resetAfterColumnIndex: jest.fn(),
+      resetAfterRowIndex: jest.fn(),
+      scrollTo: jest.fn(),
+      scrollToItem: jest.fn(),
+    },
+  };
+  const outerGridElementRef = { current: null };
+  const gridItemsRenderedRef = { current: null };
+
+  const mockArgs = {
+    gridRef,
+    outerGridElementRef,
+    gridItemsRenderedRef,
+    gridStyles: startingStyles,
+    columns: [{ id: 'A' }, { id: 'B' }],
+    rowHeightOptions: undefined,
+  };
+
+  let requestAnimationFrameSpy: jest.SpyInstance;
+
+  beforeEach(() => {
+    requestAnimationFrameSpy = jest
+      .spyOn(window, 'requestAnimationFrame')
+      .mockImplementation((cb: any) => cb());
+  });
+
+  afterEach(() => {
+    requestAnimationFrameSpy.mockRestore();
+  });
+
+  it('instantiates and returns an instance of RowHeightUtils', () => {
+    const { return: rowHeightUtils } = testCustomHook<RowHeightUtils>(() =>
+      useRowHeightUtils(mockArgs)
+    );
+    expect(rowHeightUtils).toBeInstanceOf(RowHeightUtils);
+  });
+
+  it('forces a rerender every time rowHeightsOptions changes', () => {
+    const { updateHookArgs } = testCustomHook<RowHeightUtils>(
+      useRowHeightUtils,
+      mockArgs
+    );
+    expect(requestAnimationFrameSpy).toHaveBeenCalledTimes(1);
+
+    updateHookArgs({ rowHeightsOptions: { defaultHeight: 300 } });
+    expect(requestAnimationFrameSpy).toHaveBeenCalledTimes(2);
+
+    updateHookArgs({
+      rowHeightsOptions: { defaultHeight: 300, rowHeights: { 0: 200 } },
+    });
+    expect(requestAnimationFrameSpy).toHaveBeenCalledTimes(3);
+  });
+
+  it('updates internal cached styles whenever gridStyle.cellPadding changes', () => {
+    const { return: rowHeightUtils, updateHookArgs } = testCustomHook<
+      RowHeightUtils
+    >(useRowHeightUtils, mockArgs);
+
+    updateHookArgs({ gridStyles: { ...startingStyles, cellPadding: 's' } });
+    // @ts-ignore - intentionally inspecting private var for test
+    expect(rowHeightUtils.styles).toEqual({
+      paddingTop: 4,
+      paddingBottom: 4,
+    });
+  });
+
+  it('prunes columns from the row heights cache if a column is hidden', () => {
+    const { return: rowHeightUtils, updateHookArgs } = testCustomHook<
+      RowHeightUtils
+    >(useRowHeightUtils, mockArgs);
+
+    act(() => {
+      rowHeightUtils.setRowHeight(0, 'A', 30, 0);
+      rowHeightUtils.setRowHeight(0, 'B', 50, 0);
+    });
+    // @ts-ignore - intentionally inspecting private var for test
+    expect(rowHeightUtils.heightsCache).toMatchInlineSnapshot(`
+      Map {
+        0 => Map {
+          "A" => 42,
+          "B" => 62,
+        },
+      }
+    `);
+
+    updateHookArgs({ columns: [{ id: 'A' }] }); // Hiding column B
+
+    // @ts-ignore - intentionally inspecting private var for test
+    expect(rowHeightUtils.heightsCache).toMatchInlineSnapshot(`
+      Map {
+        0 => Map {
+          "A" => 42,
+        },
+      }
+    `);
   });
 });
